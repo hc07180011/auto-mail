@@ -5,6 +5,9 @@ const express = require('express')
 const mongoose = require('mongoose')
 const WebSocket = require('ws')
 
+var ip = require("ip")
+console.error(ip.address())
+
 console.error(`Current dir: ${process.cwd()}`)
 
 const app = express()
