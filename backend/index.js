@@ -36,7 +36,8 @@ db.once('open', () => {
   wss.on('connection', ws => {
   })
 
-  const PORT = process.env.port || 4000
+  const PORT = (process.env.port || 4000)
+  console.error(PORT)
 
   server.listen(PORT, () => {
     console.log(`Listening on http://localhost:${PORT}`)
