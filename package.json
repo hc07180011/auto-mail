@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "npm install",
+    "build": "cd backend/; npm install",
     "start": "cd backend/; npm run server",
     "heroku-prebuild": "cd backend/"
   }
