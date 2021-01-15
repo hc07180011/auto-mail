@@ -6,9 +6,10 @@ const mongoose = require('mongoose')
 const WebSocket = require('ws')
 
 var ip = require("ip")
-console.error(ip.address())
+console.error(`ip: ${ip.address()}`)
 
 console.error(`Current dir: ${process.cwd()}`)
+console.error(`mongo url: ${process.env.MONGO_URL}`)
 
 const app = express()
 const server = http.createServer(app)
