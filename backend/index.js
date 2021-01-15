@@ -5,7 +5,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const WebSocket = require('ws')
 
-console.log(process.cwd())
+console.error(`Current dir: ${process.cwd()}`)
 
 const app = express()
 const server = http.createServer(app)
