@@ -38,7 +38,7 @@ db.once('open', () => {
   })
 
   const PORT = (process.env.port || 4000)
-  console.error(PORT)
+  console.error(process.env.port , PORT)
 
   server.listen(PORT, () => {
     console.log(`Listening on http://localhost:${PORT}`)
