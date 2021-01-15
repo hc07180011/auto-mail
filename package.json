@@ -1,7 +1,6 @@
 {
   "scripts": {
     "start": "yarn server",
-    "build": "webpack",
     "heroku-prebuild": "cd backend/"
   }
 }
