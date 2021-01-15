@@ -2,6 +2,6 @@
   "scripts": {
     "start": "yarn server",
     "build": "yarn server",
-    "heroku-prebuild": "cd backend/"
+    "heroku-prebuild": "cd backend/; yarn"
   }
 }
