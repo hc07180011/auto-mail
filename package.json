@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "start": "yarn server",
-    "build": "yarn server",
-    "heroku-prebuild": "cd backend/; yarn"
+    "start": "npm run server",
+    "build": "npm run server",
+    "heroku-prebuild": "cd backend/; npm install"
   }
 }
