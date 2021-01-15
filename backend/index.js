@@ -5,6 +5,8 @@ const express = require('express')
 const mongoose = require('mongoose')
 const WebSocket = require('ws')
 
+console.log(process.cwd())
+
 const app = express()
 const server = http.createServer(app)
 const wss = new WebSocket.Server({ server })
