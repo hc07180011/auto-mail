@@ -1,19 +1,18 @@
 require('dotenv-defaults').config()
 
-const http = require('http')
 const express = require('express')
+const cors = require('cors')
 const mongoose = require('mongoose')
-const WebSocket = require('ws')
 
-var ip = require("ip")
+const ip = require("ip")
 console.error(`ip: ${ip.address()}`)
 
 console.error(`Current dir: ${process.cwd()}`)
 console.error(`mongo url: ${process.env.MONGO_URL}`)
 
-const app = express()
-const server = http.createServer(app)
-const wss = new WebSocket.Server({ server })
+const account = require('./routes/account')
+const content = require('./routes/content')
+const deliver = require('./routes/deliver')
 
 if (!process.env.MONGO_URL) {
   console.error('Missing MONGO_URL!!!')
@@ -34,12 +33,22 @@ db.on('error', (error) => {
 db.once('open', () => {
   console.log('MongoDB connected!')
 
-  wss.on('connection', ws => {
+  const app = express()
+
+  // init middleware
+  app.use(cors())
+  app.use(express.json())
+  app.use((req, res, next) => {
+    return next()
   })
+
+  app.use('/account', account)
+  app.use('/content', content)
+  app.use('/deliver', deliver)
 
   const PORT = process.env.PORT
 
-  server.listen(PORT, '0.0.0.0', () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Listening on http://localhost:${PORT}`)
   })
 })
