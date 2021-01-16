@@ -2,7 +2,8 @@
 
 * base uri: ```api.automail.henrychao.me```
 * general status
-  * ```ok(200)```, 代表沒啥問題
+  * ```ok(200)```，no problem
+  * ```internal error(500)```，unkown error
 
 ## ```backend/routes/account.js```
 
@@ -28,6 +29,10 @@
 }
 ```
 
+* Error
+  * ```username already taken(500)```
+  * ```email already taken(500)```
+
 ### Log in
 
 >```POST ${baseUri}/account/read```
@@ -50,6 +55,9 @@
     "username": string!
 }
 ```
+
+* Auth failed
+  * ```wrong username/password(200)```
 
 ### Add user's email
 
@@ -95,12 +103,16 @@
         {
             "id": string!,
             "address": string!,
+            "password": string!,
             "status": bool!
         },
         ...
     ]
 }
 ```
+
+* Error
+  * ```token invalid(500)```
 
 ### Modify email information
 
@@ -125,6 +137,9 @@
 }
 ```
 
+* Error
+  * ```token/emailId invalid(500)```
+
 ### Delete email
 
 >```POST ${baseUri}/account/email/delete```
@@ -142,7 +157,7 @@
 
 ```json
 {
-    "status": string!
+    "status": string!,
 }
 ```
 
