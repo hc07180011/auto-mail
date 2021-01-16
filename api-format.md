@@ -57,7 +57,7 @@
 ```
 
 * Auth failed
-  * ```wrong username/password(200)```
+  * ```wrong username/password(400)```
 
 ### Add user's email
 
@@ -175,10 +175,6 @@
     "emailId": string!,
     "subject": string!,
     "text": string!,
-    "attachments": [
-        file_object!,
-        ...
-    ]
 }
 ```
 
@@ -240,14 +236,6 @@
     "status": string!,
     "subject": string!,
     "text": string!,
-    "attachments": [
-        {
-            "id": string!,
-            "fileName": string!,
-            "thumbnail": string
-        },
-        ...
-    ]
 }
 ```
 
@@ -264,16 +252,6 @@
     "contentId": string!,
     "subject": string!,
     "text": string!,
-    "attachments": [
-        file_object!,
-        ...
-    ],
-    "deleteFiles": [
-        {
-            "id": string!
-        },
-        ...
-    ]
 }
 ```
 

@@ -15,11 +15,14 @@ router.post('/create', (req, res) => {
   const username = req.body.username
   const email = req.body.email
   const password = req.body.password
+  console.log('/account/create', username, email, password)
+
   const seed = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
   const token = Array(256).fill(seed).map(function(x) {
     return x[Math.floor(Math.random() * x.length)]
   }).join('')
   const mailList = []
+  
   User.insertMany([{
     username: username,
     email: email,
@@ -27,22 +30,25 @@ router.post('/create', (req, res) => {
     token: token,
     mailList: mailList,
   }], (err, result) => {
-    if (err.name && err.name === 'BulkWriteError') {
+    console.log(err)
+    if (err && err.name && err.name === 'BulkWriteError') {
       User.find({
         username: username
       })
       .exec((error, response) => {
-        if (error) {
-          res.status(500).send({
-            status: 'internal error',
-          })
-        }
-        else if (response.length) {
+        if (response.length) {
+          console.log('username already taken')
           res.status(500).send({
             status: 'username already taken',
           })
         }
-        else {
+      })
+      User.find({
+        email: email
+      })
+      .exec((error, response) => {
+        if (response.length) {
+          console.log('email already taken')
           res.status(500).send({
             status: 'email already taken',
           })
@@ -50,11 +56,13 @@ router.post('/create', (req, res) => {
       })
     }
     else if (err) {
+      console.log(err)
       res.status(500).send({
         status: 'internal error',
       })
     }
     else {
+      console.log('ok')
       res.status(200).send({
         status: 'ok',
       })
@@ -65,6 +73,8 @@ router.post('/create', (req, res) => {
 router.post('/read', (req, res) => {
   const usernameOrEmail = req.body.usernameOrEmail
   const password = req.body.password
+  console.log('/account/read', usernameOrEmail, password)
+
   User.find({
     $and: [
       { $or: [{username: usernameOrEmail}, {email: usernameOrEmail}] },
@@ -73,16 +83,19 @@ router.post('/read', (req, res) => {
    })
   .exec((error, response) => {
     if (error) {
+      console.log(error)
       res.status(500).send({
         status: 'internal error',
       })
     }
     else if (!response.length) {
-      res.status(200).send({
+      console.log('wrong username/password')
+      res.status(400).send({
         status: 'wrong username/password',
       })
     }
     else {
+      console.log('ok')
       res.status(200).send({
         status: 'ok',
         token: response[0].token,
@@ -93,6 +106,7 @@ router.post('/read', (req, res) => {
 })
 
 router.post('/delete', (_, res) => {
+  console.log('delete all data')
   User.deleteMany({}, () => {
     res.status(200).send({
       status: 'ok',
@@ -105,6 +119,8 @@ router.post('/email/create', (req, res) => {
   const address = req.body.address
   const password = req.body.password
   const id = mongoose.Types.ObjectId()
+  console.log('/account/email/create', token, address, password, id)
+
   User.updateOne(
     {token: token},
     { 
@@ -119,11 +135,13 @@ router.post('/email/create', (req, res) => {
     },
     (err, result) => {
       if (err) {
+        console.log(err)
         res.status(500).send({
           status: 'internal error',
         })
       }
       else {
+        console.log('ok')
         res.status(200).send({
           status: 'ok',
           id: id,
@@ -135,31 +153,40 @@ router.post('/email/create', (req, res) => {
 
 router.post('/email/read', (req, res) => {
   const token = req.body.token
+  console.log('/account/email/read', token)
+
   User.find({
     token: token
   })
   .exec((error, response) => {
     if (error) {
+      console.log(errpr)
       res.status(500).send({
         status: 'internal error',
       })
     }
     else if (!response.length) {
+      console.log('token invalid')
       res.status(500).send({
         status: 'token invalid',
       })
     }
     else {
+      console.log('ok')
       res.status(200).send({
         status: 'ok',
-        email: response[0].mailList.map(elem => {
-          return {
-            id: elem._id,
-            address: elem.address,
-            password: elem.password,
-            status: "true",
-          }
-        }),
+        email: (
+          response[0].mailList.length ?
+          response[0].mailList.map((elem) => {
+            return {
+              id: elem._id,
+              address: elem.address,
+              password: elem.password,
+              status: "true",
+            }
+          }) :
+          []
+        ),
       })
     }
   })
@@ -170,6 +197,8 @@ router.post('/email/update', (req, res) => {
   const emailId = req.body.emailId
   const address = req.body.address
   const password = req.body.password
+  console.log('/account/email/update', token, emailId, address, password)
+
   User.updateOne({
       token: token,
       "mailList._id": emailId,
@@ -182,16 +211,19 @@ router.post('/email/update', (req, res) => {
     },
     (err, result) => {
       if (err) {
+        console.log('internal error')
         res.status(500).send({
           status: 'internal error',
         })
       }
       else if (!result.n) {
+        console.log('token/emailId invalid')
         res.status(500).send({
           status: 'token/emailId invalid',
         })
       }
       else {
+        console.log('ok')
         res.status(200).send({
           status: 'ok',
         })
@@ -203,6 +235,8 @@ router.post('/email/update', (req, res) => {
 router.post('/email/delete', (req, res) => {
   const token = req.body.token
   const emailId = req.body.emailId
+  console.log('/account/email/delete', token, emailId)
+
   User.updateOne({
       token: token,
     },
@@ -213,16 +247,19 @@ router.post('/email/delete', (req, res) => {
     },
     (err, result) => {
       if (err) {
+        console.log('internal error')
         res.status(500).send({
           status: 'internal error',
         })
       }
       else if (!result.n || !result.nModified) {
+        console.log('token/emailId invalid')
         res.status(500).send({
           status: 'token/emailId invalid',
         })
       }
       else {
+        console.log('ok')
         res.status(200).send({
           status: 'ok',
         })
