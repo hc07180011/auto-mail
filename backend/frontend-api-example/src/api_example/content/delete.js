@@ -1,12 +1,6 @@
 import React, {useState} from 'react';
-import axios from 'axios';
 
-const API_ROOT = 'http://localhost:4000/'
-const instance = axios.create({
-  baseURL: API_ROOT
-})
-
-function ContentDelete() {
+function ContentDelete(props) {
   const [state, setState] = useState({
     token: "",
     emailId: "",
@@ -15,7 +9,7 @@ function ContentDelete() {
   })
 
   const onSubmit = () => {
-    instance.post('/content/delete', {
+    props.instance.post('/content/delete', {
       token: state.token,
       emailId: state.emailId,
       contentId: state.contentId,

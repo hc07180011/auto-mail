@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 
 import AccountRead from './api_example/account/read';
 import AccountCreate from './api_example/account/create';
@@ -14,7 +15,11 @@ import ContentDelete from './api_example/content/delete';
 import ContentDetailRead from './api_example/content/detail_read';
 import ContentDetailUpdate from './api_example/content/detail_update';
 
-const baseUri = "api.automail.henrychao.me"
+const baseUri = 'api.automail.henrychao.me'
+const API_ROOT = 'http://api.automail.henrychao.me'
+const instance = axios.create({
+  baseURL: API_ROOT
+})
 
 class App extends React.Component {
 
@@ -27,40 +32,40 @@ class App extends React.Component {
     let page
     switch (this.state.page) {
       case "AccountCreate":
-        page = <AccountCreate />
+        page = <AccountCreate instance={instance} />
         break
       case "AccountRead":
-        page = <AccountRead />
+        page = <AccountRead instance={instance} />
         break
       case "AccountDelete":
-        page = <AccountDelete />
+        page = <AccountDelete instance={instance} />
         break
       case "AccountEmailCreate":
-        page = <AccountEmailCreate />
+        page = <AccountEmailCreate instance={instance} />
         break
       case "AccountEmailRead":
-        page = <AccountEmailRead />
+        page = <AccountEmailRead instance={instance} />
         break
       case "AccountEmailUpdate":
-        page = <AccountEmailUpdate />
+        page = <AccountEmailUpdate instance={instance} />
         break
       case "AccountEmailDelete":
-        page = <AccountEmailDelete />
+        page = <AccountEmailDelete instance={instance} />
         break
       case "ContentCreate":
-        page = <ContentCreate />
+        page = <ContentCreate instance={instance} />
         break
       case "ContentRead":
-        page = <ContentRead />
+        page = <ContentRead instance={instance} />
         break
       case "ContentDelete":
-        page = <ContentDelete />
+        page = <ContentDelete instance={instance} />
         break
       case "ContentDetailRead":
-        page = <ContentDetailRead />
+        page = <ContentDetailRead instance={instance} />
         break
       case "ContentDetailUpdate":
-        page = <ContentDetailUpdate />
+        page = <ContentDetailUpdate instance={instance} />
         break
       default:
         break

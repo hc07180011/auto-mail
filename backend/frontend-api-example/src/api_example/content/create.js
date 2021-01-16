@@ -1,12 +1,6 @@
 import React, {useState} from 'react';
-import axios from 'axios';
 
-const API_ROOT = 'http://localhost:4000/'
-const instance = axios.create({
-  baseURL: API_ROOT
-})
-
-function ContentCreate() {
+function ContentCreate(props) {
   const [state, setState] = useState({
     token: "",
     emailId: "",
@@ -17,7 +11,7 @@ function ContentCreate() {
   })
 
   const onSubmit = () => {
-    instance.post('/content/create', {
+    props.instance.post('/content/create', {
       token: state.token,
       emailId: state.emailId,
       subject: state.subject,

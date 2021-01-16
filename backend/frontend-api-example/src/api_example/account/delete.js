@@ -1,12 +1,6 @@
 import React, {useState} from 'react';
-import axios from 'axios';
 
-const API_ROOT = 'http://localhost:4000/'
-const instance = axios.create({
-  baseURL: API_ROOT
-})
-
-function AccountDelete() {
+function AccountDelete(props) {
   const [state, setState] = useState({
     usernameOrEmail: "admin",
     password: "henry0718",
@@ -16,7 +10,7 @@ function AccountDelete() {
   })
 
   const onSubmit = () => {
-    instance.post('/account/delete', {
+    props.instance.post('/account/delete', {
     })
     .then((res) => {
       setState({

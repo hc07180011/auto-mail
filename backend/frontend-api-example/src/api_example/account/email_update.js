@@ -1,12 +1,6 @@
 import React, {useState} from 'react';
-import axios from 'axios';
 
-const API_ROOT = 'http://localhost:4000/'
-const instance = axios.create({
-  baseURL: API_ROOT
-})
-
-function AccountEmailUpdate() {
+function AccountEmailUpdate(props) {
   const [state, setState] = useState({
     token: "",
     emailId: "",
@@ -16,7 +10,7 @@ function AccountEmailUpdate() {
   })
 
   const onSubmit = () => {
-    instance.post('/account/email/update', {
+    props.instance.post('/account/email/update', {
       token: state.token,
       emailId: state.emailId,
       address: state.address,
@@ -62,7 +56,7 @@ function AccountEmailUpdate() {
         password: e.target.value,
       })}></input>
       <br></br>
-      <button onClick={() => onSubmit()}>Add email</button>
+      <button onClick={() => onSubmit()}>Update email</button>
       <br></br>
       status: {state.status}
     </div>

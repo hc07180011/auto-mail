@@ -1,12 +1,6 @@
 import React, {useState} from 'react';
-import axios from 'axios';
 
-const API_ROOT = 'http://localhost:4000/'
-const instance = axios.create({
-  baseURL: API_ROOT
-})
-
-function AccountCreate() {
+function AccountCreate(props) {
   const [state, setState] = useState({
     username: "admin",
     email: "hendry0718@gmail.com",
@@ -15,7 +9,7 @@ function AccountCreate() {
   })
 
   const onSubmit = () => {
-    instance.post('/account/create', {
+    props.instance.post('/account/create', {
       username: state.username,
       email: state.email,
       password: state.password
