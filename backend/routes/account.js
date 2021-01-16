@@ -3,10 +3,10 @@ const { model } = require('mongoose')
 
 const router = express.Router()
 
-router.post('/register', (req, res) => {
-    res.status(200).send({
-        msg: 'ok'
-    })
-})
+router.post('/testAlive', (_, res) => {
+  res.status(200).send({
+    status: 'ok'
+  })
+}) 
 
 module.exports = router
