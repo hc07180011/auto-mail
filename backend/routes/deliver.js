@@ -2,7 +2,10 @@ const express = require('express')
 const nodemailer = require('nodemailer')
 
 const multer = require('multer')
-var upload = multer({ storage: multer.memoryStorage() })
+var upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 16 * 1024 * 1024 }
+})
 
 const router = express.Router()
 
@@ -14,7 +17,7 @@ router.post('/testAlive', (_, res) => {
   })
 })
 
-router.post('/create', upload.array('attachments', 32), (req, res) => {
+router.post('/create', upload.array('attachments', 8), (req, res) => {
   const token = req.body.token
   const emailId = req.body.emailId
   const contentId = req.body.contentId

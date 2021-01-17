@@ -1,5 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const crypto = require('crypto')
 
 const router = express.Router()
 
@@ -14,7 +15,7 @@ router.post('/testAlive', (_, res) => {
 router.post('/create', (req, res) => {
   const username = req.body.username
   const email = req.body.email
-  const password = req.body.password
+  const password = crypto.createHash('md5').update(req.body.password).digest('hex')
   console.log('/account/create', username, email, password)
 
   const seed = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
@@ -72,7 +73,7 @@ router.post('/create', (req, res) => {
 
 router.post('/read', (req, res) => {
   const usernameOrEmail = req.body.usernameOrEmail
-  const password = req.body.password
+  const password = crypto.createHash('md5').update(req.body.password).digest('hex')
   console.log('/account/read', usernameOrEmail, password)
 
   User.find({

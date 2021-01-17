@@ -2,6 +2,7 @@ require('dotenv-defaults').config()
 
 const express = require('express')
 const cors = require('cors')
+const rateLimit = require('express-rate-limit')
 const mongoose = require('mongoose')
 
 const ip = require("ip")
@@ -35,8 +36,14 @@ db.once('open', () => {
 
   const app = express()
 
+  const limiter = rateLimit({
+    windowMs: 5 * 60 * 1000,
+    max: 100
+  })
+
   // init middleware
   app.use(cors())
+  app.use(limiter)
   app.use(express.json())
   app.use((req, res, next) => {
     return next()
