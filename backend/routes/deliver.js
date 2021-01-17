@@ -41,7 +41,7 @@ router.post('/create', upload.array('attachments', 32), (req, res) => {
     }
     else if (!response.length || !response[0].mailList.length) {
       console.log('internal error')
-      res.status(500).send({
+      res.status(200).send({
         status: 'token/emailId invalid',
       })
     }

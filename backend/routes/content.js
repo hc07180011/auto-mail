@@ -41,7 +41,7 @@ router.post('/create', (req, res) => {
       }
       else if (!result.n) {
         console.log('token/emailId invalid')
-        res.status(500).send({
+        res.status(200).send({
           status: 'token/emailId invalid',
         })
       }
@@ -77,7 +77,7 @@ router.post('/read', (req, res) => {
     }
     else if (!response.length || !response[0].mailList.length) {
       console.log('internal error')
-      res.status(500).send({
+      res.status(200).send({
         status: 'token/emailId invalid',
       })
     }
@@ -124,7 +124,7 @@ router.post('/detail/read', (req, res) => {
     }
     else if (!response.length || !response[0].mailList.length || !response[0].mailList[0].content.length) {
       console.log('token/emailId/contentId invalid')
-      res.status(500).send({
+      res.status(200).send({
         status: 'token/emailId/contentId invalid',
       })
     }
@@ -174,7 +174,7 @@ router.post('/detail/update', (req, res) => {
       }
       else if (!result.n) {
         console.log('token/emailId invalid')
-        res.status(500).send({
+        res.status(200).send({
           status: 'token/emailId invalid',
         })
       }
@@ -212,7 +212,7 @@ router.post('/delete', (req, res) => {
       }
       else if (!result.n || !result.nModified) {
         console.log('token/emailId/contentId invalid')
-        res.status(500).send({
+        res.status(200).send({
           status: 'token/emailId/contentId invalid',
         })
       }

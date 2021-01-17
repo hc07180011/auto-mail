@@ -38,7 +38,7 @@ router.post('/create', (req, res) => {
       .exec((error, response) => {
         if (response.length) {
           console.log('username already taken')
-          res.status(500).send({
+          res.status(200).send({
             status: 'username already taken',
           })
         }
@@ -49,7 +49,7 @@ router.post('/create', (req, res) => {
       .exec((error, response) => {
         if (response.length) {
           console.log('email already taken')
-          res.status(500).send({
+          res.status(200).send({
             status: 'email already taken',
           })
         }
@@ -90,7 +90,7 @@ router.post('/read', (req, res) => {
     }
     else if (!response.length) {
       console.log('wrong username/password')
-      res.status(400).send({
+      res.status(200).send({
         status: 'wrong username/password',
       })
     }
@@ -167,7 +167,7 @@ router.post('/email/read', (req, res) => {
     }
     else if (!response.length) {
       console.log('token invalid')
-      res.status(500).send({
+      res.status(200).send({
         status: 'token invalid',
       })
     }
@@ -218,7 +218,7 @@ router.post('/email/update', (req, res) => {
       }
       else if (!result.n) {
         console.log('token/emailId invalid')
-        res.status(500).send({
+        res.status(200).send({
           status: 'token/emailId invalid',
         })
       }
@@ -254,7 +254,7 @@ router.post('/email/delete', (req, res) => {
       }
       else if (!result.n || !result.nModified) {
         console.log('token/emailId invalid')
-        res.status(500).send({
+        res.status(200).send({
           status: 'token/emailId invalid',
         })
       }
