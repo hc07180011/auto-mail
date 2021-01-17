@@ -1,19 +1,8 @@
-const fs = require('fs')
-const path = require('path')
 const express = require('express')
-const mongoose = require('mongoose')
 const nodemailer = require('nodemailer')
 
 const multer = require('multer')
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-      cb(null, 'upload/')
-  },
-  filename: function (req, file, cb) {
-      cb(null, file.originalname)
-  }
-})
-var upload = multer({ storage: storage })
+var upload = multer({ storage: multer.memoryStorage() })
 
 const router = express.Router()
 
@@ -73,7 +62,13 @@ router.post('/create', upload.array('attachments', 32), (req, res) => {
           bcc: bcc,
           subject: 'Sending Email using Node.js',
           html: '<h1>Welcome</h1><p>That was easy!</p>',
-          attachments: attachments
+          attachments: attachments.map((attachment) => (
+             {
+              filename: attachment.originalname,
+              content: Buffer.from(attachment.buffer),
+              contentType: attachment.mimetype,
+             }
+          ))
         }
         
         transporter.sendMail(mailOptions, function(error, info) {
@@ -81,13 +76,6 @@ router.post('/create', upload.array('attachments', 32), (req, res) => {
             console.log(error)
           } else {
             console.log('Email sent: ' + info.response)
-          }
-          if (index === recipients.length - 1) {
-            attachments.forEach((attachment) => {
-              fs.unlink(path.join('upload/', attachment.originalname), (err, res) => {
-                console.log(err, res)
-              })
-            })
           }
         })
       })
