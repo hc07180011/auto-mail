@@ -1,9 +1,19 @@
+const fs = require('fs')
+const path = require('path')
 const express = require('express')
 const mongoose = require('mongoose')
 const nodemailer = require('nodemailer')
 
 const multer = require('multer')
-const upload = multer({ dest: 'upload/'})
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'upload/')
+  },
+  filename: function (req, file, cb) {
+      cb(null, file.originalname)
+  }
+})
+var upload = multer({ storage: storage })
 
 const router = express.Router()
 
@@ -23,7 +33,7 @@ router.post('/create', upload.array('attachments', 32), (req, res) => {
   const recipients = req.body.recipients.split(",")
   const cc = req.body.cc
   const bcc = req.body.bcc
-  console.log('/deliver/create', token, emailId, contentId, recipients, cc, bcc, req.files)
+  console.log('/deliver/create', token, emailId, contentId, recipients, cc, bcc, attachments)
 
   User.find({
     $and: [
@@ -47,7 +57,7 @@ router.post('/create', upload.array('attachments', 32), (req, res) => {
       })
     }
     else {
-      recipients.forEach(recipient => {
+      recipients.forEach((recipient, index) => {
         var transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
@@ -68,9 +78,16 @@ router.post('/create', upload.array('attachments', 32), (req, res) => {
         
         transporter.sendMail(mailOptions, function(error, info) {
           if (error) {
-            console.log(error);
+            console.log(error)
           } else {
-            console.log('Email sent: ' + info.response);
+            console.log('Email sent: ' + info.response)
+          }
+          if (index === recipients.length - 1) {
+            attachments.forEach((attachment) => {
+              fs.unlink(path.join('upload/', attachment.originalname), (err, res) => {
+                console.log(err, res)
+              })
+            })
           }
         })
       })
