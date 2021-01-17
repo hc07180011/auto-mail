@@ -46,42 +46,46 @@ router.post('/create', upload.array('attachments', 32), (req, res) => {
       })
     }
     else {
-      recipients.forEach((recipient, index) => {
-        var transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: response[0].mailList[0].address,
-            pass: response[0].mailList[0].password,
-          }
-        })
-        
-        var mailOptions = {
-          from: response[0].mailList[0].address,
-          to: recipient,
-          cc: cc,
-          bcc: bcc,
-          subject: 'Sending Email using Node.js',
-          html: '<h1>Welcome</h1><p>That was easy!</p>',
-          attachments: attachments.map((attachment) => (
-             {
-              filename: attachment.originalname,
-              content: Buffer.from(attachment.buffer),
-              contentType: attachment.mimetype,
-             }
-          ))
+      response[0].mailList[0].content.forEach((content) => {
+        if (String(content._id) === String(contentId)) {
+          recipients.forEach((recipient, index) => {
+            var transporter = nodemailer.createTransport({
+              service: 'gmail',
+              auth: {
+                user: response[0].mailList[0].address,
+                pass: response[0].mailList[0].password,
+              }
+            })
+            
+            var mailOptions = {
+              from: response[0].mailList[0].address,
+              to: recipient,
+              cc: cc,
+              bcc: bcc,
+              subject: content.subject,
+              html: content.text,
+              attachments: attachments.map((attachment) => (
+                 {
+                  filename: attachment.originalname,
+                  content: Buffer.from(attachment.buffer),
+                  contentType: attachment.mimetype,
+                 }
+              ))
+            }
+            
+            transporter.sendMail(mailOptions, function(error, info) {
+              if (error) {
+                console.log(error)
+              } else {
+                console.log('Email sent: ' + info.response)
+              }
+            })
+          })
+          console.log('ok')
+          res.status(200).send({
+            status: 'ok',
+          })
         }
-        
-        transporter.sendMail(mailOptions, function(error, info) {
-          if (error) {
-            console.log(error)
-          } else {
-            console.log('Email sent: ' + info.response)
-          }
-        })
-      })
-      console.log('ok')
-      res.status(200).send({
-        status: 'ok',
       })
     }
   })
