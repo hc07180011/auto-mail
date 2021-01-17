@@ -287,7 +287,7 @@
 
 ## ```backend/routes/deliver.js```
 
->```POST ${baseUri}/deliver```
+>```POST ${baseUri}/deliver/create```
 
 * Request
 

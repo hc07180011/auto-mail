@@ -15,8 +15,12 @@ import ContentDelete from './api_example/content/delete';
 import ContentDetailRead from './api_example/content/detail_read';
 import ContentDetailUpdate from './api_example/content/detail_update';
 
-const baseUri = 'api.automail.henrychao.me'
-const API_ROOT = 'http://api.automail.henrychao.me'
+import DeliverCreate from './api_example/deliver/create';
+
+// const baseUri = 'api.automail.henrychao.me'
+// const API_ROOT = 'http://api.automail.henrychao.me'
+const baseUri = 'localhost:4000'
+const API_ROOT = 'http://localhost:4000'
 const instance = axios.create({
   baseURL: API_ROOT
 })
@@ -67,6 +71,9 @@ class App extends React.Component {
       case "ContentDetailUpdate":
         page = <ContentDetailUpdate instance={instance} />
         break
+      case "DeliverCreate":
+        page = <DeliverCreate instance={instance} />
+        break
       default:
         break
     }
@@ -88,6 +95,7 @@ class App extends React.Component {
           <option value="ContentDetailRead">POST {baseUri}/content/detail/read</option>
           <option value="ContentDetailUpdate">POST {baseUri}/content/detail/update</option>
           <option value="ContentDelete">POST {baseUri}/content/delete</option>
+          <option value="DeliverCreate">POST {baseUri}/deliver/create</option>
         </select>
         <br></br>
         <hr></hr>
