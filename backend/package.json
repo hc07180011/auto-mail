@@ -6,6 +6,8 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "express-rate-limit": "^5.2.3",
+    "google-auth-library": "^6.1.4",
+    "googleapis": "^67.0.0",
     "http": "^0.0.1-security",
     "ip": "^1.1.5",
     "mongoose": "^5.11.12",

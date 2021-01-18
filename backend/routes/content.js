@@ -49,6 +49,7 @@ router.post('/create', (req, res) => {
         console.log('ok')
         res.status(200).send({
           status: 'ok',
+          id: id,
         })
       }
     },

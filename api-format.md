@@ -296,6 +296,7 @@
     "token": string!,
     "emailId": string!,
     "contentId": string!,
+    "authToken": string!,
     "recipients": [
         string!,
         ...

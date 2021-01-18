@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import GoogleLogin from 'react-google-login';
 
 function AccountRead(props) {
   const [state, setState] = useState({
@@ -8,6 +9,7 @@ function AccountRead(props) {
     token: "",
     username: "",
   })
+
 
   const onSubmit = () => {
     props.instance.post('/account/read', {
@@ -21,6 +23,66 @@ function AccountRead(props) {
         token: res.data.token,
         username: res.data.username,
       })
+    })
+    .catch((err) => {
+      setState({
+        ...state,
+        status: "error",
+      })
+    })
+  }
+
+  const responseGoogle = (response) => {
+    const username = response.profileObj.name + " (" + response.profileObj.email + ")"
+    const email = response.profileObj.email
+    const password = response.googleId
+
+    props.instance.post('/account/read', {
+      usernameOrEmail: username,
+      password: password
+    })
+    .then((res) => {
+      if (res.data.status === "ok") {
+        setState({
+          ...state,
+          status: res.data.status,
+          token: res.data.token,
+          username: res.data.username,
+        })
+      }
+      else {
+        props.instance.post('/account/create', {
+          username: username,
+          email: email,
+          password: password
+        })
+        .then((res) => {
+          props.instance.post('/account/read', {
+            usernameOrEmail: username,
+            password: password
+          })
+          .then((res) => {
+            setState({
+              ...state,
+              status: res.data.status,
+              token: res.data.token,
+              username: res.data.username,
+            })
+          })
+          .catch((err) => {
+            setState({
+              ...state,
+              status: "error",
+            })
+          })
+        })
+        .catch((err) => {
+          setState({
+            ...state,
+            status: "error",
+          })
+        })
+      }
     })
     .catch((err) => {
       setState({
@@ -45,6 +107,14 @@ function AccountRead(props) {
       })}></input>
       <br></br>
       <button onClick={() => onSubmit()}>Log in</button>
+      <br></br>
+      <GoogleLogin
+        clientId="421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com"
+        buttonText="Log in with Google"
+        onSuccess={responseGoogle}
+        onFailure={responseGoogle}
+        cookiePolicy={'single_host_origin'}
+      />
       <br></br>
       status: {state.status}
       <br></br>
