@@ -42,6 +42,9 @@ function DeliverCreate(props) {
   }
 
   const responseGoogle = (response) => {
+    if (state.contentId === "") {
+      return
+    }
     var data = new FormData()
     data.append("token", state.token)
     data.append("emailId", state.emailId)
