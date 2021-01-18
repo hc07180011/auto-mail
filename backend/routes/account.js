@@ -182,7 +182,6 @@ router.post('/email/read', (req, res) => {
             return {
               id: elem._id,
               address: elem.address,
-              password: elem.password,
               status: "true",
             }
           }) :
