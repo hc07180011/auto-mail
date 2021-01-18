@@ -41,8 +41,16 @@ db.once('open', () => {
     max: 100
   })
 
+  var corsOptions = {
+    allowHeaders: ['X-Requested-With','Access-Control-Allow-Origin','X-HTTP-Method-Override','Content-Type','Authorization','Accept'],
+    allowCredentials: true,
+    exposeHeaders: [],
+    maxAge: 86400,
+    origin: '*',
+  }
+
   // init middleware
-  app.use(cors())
+  app.use(cors(corsOptions))
   app.use(limiter)
   app.use(express.json())
   app.use((req, res, next) => {
