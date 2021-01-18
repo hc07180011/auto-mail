@@ -12,7 +12,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useState, useRef } from "react";
-import { login } from "./axios";
+import { login, signUp } from "./axios";
+import GoogleLogin from "react-google-login"
 
 function Copyright() {
   return (
@@ -82,11 +83,44 @@ const LoginPage = ({ toSignUp, toEditor }) => {
           setUsernameOrEmailError(true);
           setPasswordError(true);
         } else {
-          // unknown error
+          // unexpected error
         }
       }
     }
-  }
+  };
+
+  const googleLoginSuccess = (res) => {
+    const username = `${res.profileObj.name} (${res.profileObj.email})`;
+    const email = res.profileObj.email;
+    const password = res.googleId;
+
+    login({usernameOrEmail: username, password})
+      .then(({ data: { status } }) => {
+        if (status === "ok") {
+          toEditor();
+        } else {
+          signUp({ username, email, password })
+            .then((res) => {
+              login({ usernameOrEmail: username, password })
+                .then(({ data: { status, token, username } }) => {
+                  toEditor();
+                })
+                .catch((err) => {
+                  // unexpected error
+                })
+            })
+            .catch((err) => {
+              // unexpected error
+            })
+        }
+      })
+      .catch((err) => {
+        // unexpected error
+      })
+  };
+  const googleLoginFailure = () => {
+
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -150,12 +184,16 @@ const LoginPage = ({ toSignUp, toEditor }) => {
           >
             Log In
           </Button>
-          <Button
-            fullWidth
-            variant="contained"
-            color="secondary"
-          >
-          </Button>
+          <GoogleLogin
+            clientId="421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com"
+            buttonText="Log in with Google"
+            onSuccess={googleLoginSuccess}
+            onFailure={googleLoginFailure}
+            cookiePolicy={'single_host_origin'}
+            /*render={(renderProps) => {
+              return <Button onClick={renderProps.onClick}>Log in with Google</Button>
+            }}*/
+          />
           <Grid container justify="flex-end">
             <Grid item>
               <Typography variant="body2" color="primary" className={classes.signup} onClick={toSignUp}>

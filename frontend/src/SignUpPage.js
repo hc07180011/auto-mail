@@ -90,7 +90,7 @@ const SignUpPage = ({ toLogin }) => {
         } else if (status === "email already taken") {
           setEmailError(true);
         } else {
-          // unknown error
+          // unexpected error
         }
       }
     }
