@@ -42,7 +42,11 @@ db.once('open', () => {
   })
 
   var corsOptions = {
-    allowHeaders: ['X-Requested-With','Access-Control-Allow-Origin','X-HTTP-Method-Override','Content-Type','Authorization','Accept'],
+    allowHeaders: [
+      'X-Requested-With','Access-Control-Allow-Origin','X-HTTP-Method-Override',
+      'Content-Type','Authorization','Accept','Accept-Version','Date',
+      'X-Api-Version','Content-MD5','Content-Length','X-CSRF-Token'
+    ],
     allowCredentials: true,
     exposeHeaders: [],
     maxAge: 86400,
