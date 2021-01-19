@@ -1,20 +1,39 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import InputBase from "@material-ui/core/InputBase";
 import { fade, makeStyles } from "@material-ui/core/styles";
+import Button from '@material-ui/core/Button';
+import Box from '@material-ui/core/Box';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+import Link from '@material-ui/core/Link';
 import SearchIcon from "@material-ui/icons/Search";
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import IconButton from '@material-ui/core/IconButton';
+
+import logo from './img/logo.png';
+import backgroundImage from './img/background.png';
 
 import LoginPage from "./LoginPage";
 import SignUpPage from "./SignUpPage";
 import EditorPage from "./EditorPage";
 import { message } from "antd";
+
+function Copyright() {
+  return (
+    <Typography variant="body2" color="textSecondary" align="center">
+      {'Copyright © '}
+      <Link color="inherit" href="">
+        Pigeons
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  );
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -79,6 +98,18 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState({});
   const [timeoutId, setTimeoutId] = useState(null);
+  
+  const [size, setSize] = useState([0, 0]);
+  useLayoutEffect(() => {
+    function updateSize() {
+      setSize([window.innerWidth, window.innerHeight]);
+      console.log(window.innerWidth, window.innerHeight)
+      console.log(((size[0] / size[1] - 1.0) * 39.685).toString() + "%")
+    }
+    window.addEventListener('resize', updateSize);
+    updateSize();
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
 
   useEffect(() => {
     const localState = JSON.parse(localStorage.getItem("localState"));
@@ -143,64 +174,68 @@ const App = () => {
   
     return (
       <AppBar style={{ background: "rgb(216,234,245)", marginBottom: "1%" }} position="static">
-        <Toolbar>
-          <img
-            alt="logo-img-main"
-            src="http://abclabs.csie.org/automail/images/logo.png"
-            width="50px"
-          />
-          <Typography className={classes.title} variant="h6" noWrap>
-            &nbsp;&nbsp;Pigeons
-          </Typography>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput
-              }}
-              inputProps={{ "aria-label": "search" }}
+          <Toolbar>
+            <img
+              alt="logo-img-main"
+              src={logo}
+              width="50px"
             />
-          </div>
-          {
-            token !== "" ?
-            <div style={{ marginLeft: "1%", color: "#3e7bbc" }}>
-              Welcome, {username.slice(0, username.length < 10 ? username.length : 10) + (username.length < 10 ? "" : " ...") }
-              <IconButton
-                edge="end"
-                aria-label="account of current user"
-                aria-haspopup="true"
-                onClick={handleMenu}
-                color="inherit"
-              >
-                <AccountCircle />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+            <Typography className={classes.title} variant="h6" noWrap>
+              &nbsp;&nbsp;Pigeons
+            </Typography>
+            <div className={classes.search} display="none">
+              <div className={classes.searchIcon}>
+                <SearchIcon />
+              </div>
+              <InputBase
+                placeholder="Search…"
+                classes={{
+                  root: classes.inputRoot,
+                  input: classes.inputInput
                 }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={open}
-                onClose={handleClose}
-              >
-                {/* <MenuItem onClick={handleClose}></MenuItem> */}
-                <MenuItem style={{ justifyContent: "flex-end" }} onClick={() => {setPage("login"); setToken("")}}>Log out</MenuItem>
-              </Menu>
-            </div> :
-            <></>
-          } 
-        </Toolbar>
-      </AppBar>
+                inputProps={{ "aria-label": "search" }}
+              />
+            </div>
+            {
+              token !== "" ?
+              <div style={{ marginLeft: "1%", color: "#3e7bbc" }}>
+                <label htmlFor="account-avatar">
+                  <Button color="inherit">
+                    Welcome, {username.slice(0, username.length < 10 ? username.length : 10) + (username.length < 10 ? "" : " ...") }
+                    <IconButton
+                      edge="end"
+                      aria-label="account of current user"
+                      aria-haspopup="true"
+                      onClick={handleMenu}
+                      color="inherit"
+                    >
+                      <AccountCircle />
+                    </IconButton>
+                    <Menu
+                      id="menu-appbar"
+                      anchorEl={anchorEl}
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      keepMounted
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      open={open}
+                      onClose={handleClose}
+                    >
+                      {/* <MenuItem onClick={handleClose}></MenuItem> */}
+                      <MenuItem style={{ justifyContent: "flex-end" }} onClick={() => {setPage("login"); setToken("")}}>Log out</MenuItem>
+                    </Menu>
+                  </Button>
+                </label>
+              </div> :
+              <></>
+            } 
+          </Toolbar>
+        </AppBar>
     )
   }
 
@@ -210,14 +245,16 @@ const App = () => {
 
   if (page === "signUp") {
     return (
-      <div>
+      <div style={{ backgroundImage: `url(${backgroundImage})`, height: "100vh" }}>
         <MainAppBar/>
         <SignUpPage
           toLogin={() => setPage("login")}
-          setStatus={(status) => setStatus(status)}
         />
+        <Box mt={9}>
+          <Copyright />
+        </Box>
       </div>
-    );
+    )
   } else if (page === "editor") {
     return (
       <div>
@@ -228,20 +265,25 @@ const App = () => {
           setStatus={(status) => setStatus(status)}
         />
       </div>
-    );
+    )
   } else {
     return (
-      <div>
+      <div style={{ backgroundImage: `url(${backgroundImage})`, height: "100vh" }}>
         <MainAppBar/>
-        <LoginPage
-          toSignUp={() => setPage("signUp")}
-          toEditor={() => setPage("editor")}
-          setToken={(token) => setToken(token)}
-          setUsername={(username) => setUsername(username)}
-          setStatus={(status) => setStatus(status)}
-        />
+        <div style={{ paddingLeft: (size[0] / size[1] > 1.0) ? ((size[0] / size[1] - 1.0) * 39.685).toString() + "%" : "0%"}}>
+          <LoginPage
+            toSignUp={() => setPage("signUp")}
+            toEditor={() => setPage("editor")}
+            setToken={(token) => setToken(token)}
+            setUsername={(username) => setUsername(username)}
+            setStatus={(status) => setStatus(status)}
+          />
+        </div>
+        <Box mt={14}>
+          <Copyright />
+        </Box>
       </div>
-    );
+    )
   }
 }
 

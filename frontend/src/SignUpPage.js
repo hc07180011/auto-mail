@@ -14,29 +14,19 @@ import Container from '@material-ui/core/Container';
 import { useState, useRef } from "react"
 import { signUp } from "./axios"
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="">
-        My website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    borderRadius: "10px",
+    backgroundColor: "rgba(216,234,245,0.8)",
+    boxShadow: "1px 1px 3px 4px rgba(170,180,200,0.8)",
   },
   avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    margin: theme.spacing(3),
+    backgroundColor: theme.palette.primary.main,
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -199,9 +189,6 @@ const SignUpPage = ({ toLogin, setStatus }) => {
           </Grid>
         </Container>
       </div>
-      <Box mt={5}>
-        <Copyright />
-      </Box>
     </Container>
   );
 };

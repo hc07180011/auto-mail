@@ -13,29 +13,19 @@ import { useState, useRef } from "react";
 import { login, signUp } from "./axios";
 import GoogleLogin from "react-google-login"
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="">
-        My website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    borderRadius: "10px",
+    backgroundColor: "rgba(216,234,245,0.8)",
+    boxShadow: "1px 1px 3px 4px rgba(170,180,200,0.8)",
   },
   avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    margin: theme.spacing(3),
+    backgroundColor: theme.palette.primary.main,
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -141,8 +131,12 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
         setStatus({ type: "error", msg: "First login failed." });
       })
   };
-  const googleLoginFailure = () => {
+  const googleLoginFailure = (error) => {
     // unexpected error
+    if (error.error === "idpiframe_initialization_failed") {
+      setStatus({ type: "error", msg: "IP blocked." });
+      return
+    }
     setStatus({ type: "error", msg: "Google login failed." });
   };
 
@@ -247,9 +241,6 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
           </Grid>
         </Container>
       </div>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
     </Container>
   );
 }
