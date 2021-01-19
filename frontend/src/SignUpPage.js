@@ -40,10 +40,10 @@ const useStyles = makeStyles((theme) => ({
   },
   form: {
     width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(1),
   },
   submit: {
-    margin: theme.spacing(3, 0, 2),
+    margin: theme.spacing(1, 0, 1),
   },
   login: {
     textDecoration: "none",
@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const SignUpPage = ({ toLogin }) => {
+const SignUpPage = ({ toLogin, setStatus }) => {
   const classes = useStyles();
 
   const [username, setUsername] = useState("");
@@ -67,32 +67,47 @@ const SignUpPage = ({ toLogin }) => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
-  const handleSubmit = async () => {
-    if (username === "")
-      setUsernameError(true);
-    else
-      setUsernameError(false);
-    if (email === "")
-      setEmailError(true);
-    else
-      setEmailError(false);
-    if (password === "")
-      setPasswordError(true);
-    else
-      setPasswordError(false);
+  const handleSignUp = async () => {
     if (username !== "" && email !== "" && password !== "") {
       const { status } = await signUp({ username, email, password });
       if (status === "ok") {
+        setStatus({ type: "success", msg: "Signed up successfully." });
         toLogin();
       } else {
         if (status === "username already taken") {
           setUsernameError(true);
+          setStatus({ type: "error", msg: "Username is already taken." });
         } else if (status === "email already taken") {
           setEmailError(true);
+          setStatus({ type: "error", msg: "Email is already taken." });
         } else {
           // unexpected error
         }
       }
+    } else {
+      let errorMsg = "";
+      if (username === "") {
+        setUsernameError(true);
+        if (errorMsg !== "")
+          errorMsg += " ";
+        errorMsg += "Username is required.";
+      } else
+        setUsernameError(false);
+      if (email === "") {
+        setEmailError(true);
+        if (errorMsg !== "")
+          errorMsg += " ";
+        errorMsg += "Email address is required.";
+      } else
+        setEmailError(false);
+      if (password === "") {
+        setPasswordError(true);
+        if (errorMsg !== "")
+          errorMsg += " ";
+        errorMsg += "Password is required.";
+      } else
+        setPasswordError(false);
+      setStatus({ type: "error", msg: errorMsg });
     }
   }
 
@@ -159,7 +174,7 @@ const SignUpPage = ({ toLogin }) => {
             inputRef={passwordRef}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                handleSubmit();
+                handleSignUp();
               }
             }}
             error={passwordError}
@@ -171,14 +186,14 @@ const SignUpPage = ({ toLogin }) => {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={handleSubmit}
+            onClick={handleSignUp}
           >
             Sign Up
           </Button>
           <Grid container justify="flex-end">
             <Grid item>
               <Typography variant="body2" color="primary" className={classes.login} onClick={toLogin}>
-                Already have an account? Log in
+                Already have an account? Log In
               </Typography>
             </Grid>
           </Grid>

@@ -71,8 +71,10 @@ const EmailList = ({
         variant="contained"
         color="primary"
         onClick={() => {
-          handleAddEmail();
-          setAddEmailOpen(false);
+          if (createAddress !== "" && createPassword !== "") {
+            handleAddEmail();
+            setAddEmailOpen(false);
+          }
         }}
       >
         Add

@@ -64,20 +64,10 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
   const passwordRef = useRef(null);
 
   const handleSubmit = async () => {
-    if (usernameOrEmail === "") {
-      setUsernameOrEmailError(true);
-      setStatus({type: "error", msg: "Username or Email required."})
-    }
-    else
-      setUsernameOrEmailError(false);
-    if (password === "") {
-      setPasswordError(true);
-    }
-    else
-      setPasswordError(false);
     if (usernameOrEmail !== "" && password !== "") {
       const { status, token, username } = await login({ usernameOrEmail, password });
       if (status === "ok") {
+        setStatus({ type: "success", msg: "Logged in successfully." });
         setToken(token);
         setUsername(username);
         toEditor();
@@ -85,44 +75,75 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
         if (status === "wrong username/password") {
           setUsernameOrEmailError(true);
           setPasswordError(true);
+          setStatus({ type: "error", msg: "Wrong username/password." })
         } else {
           // unexpected error
         }
       }
+    } else {
+      let errorMsg = "";
+      if (usernameOrEmail === "") {
+        setUsernameOrEmailError(true);
+        if (errorMsg !== "")
+          errorMsg += " ";
+        errorMsg += "Username or Email is required.";
+      }
+      else
+        setUsernameOrEmailError(false);
+      if (password === "") {
+        setPasswordError(true);
+        if (errorMsg !== "")
+          errorMsg += " ";
+        errorMsg += "Password is required.";
+      }
+      else
+        setPasswordError(false);
+      setStatus({ type: "error", msg: errorMsg });
     }
   };
 
-  const googleLoginSuccess = (res) => {
+  const googleLoginSuccess = async (res) => {
     const username = `${res.profileObj.name} (${res.profileObj.email})`;
     const email = res.profileObj.email;
     const password = res.googleId;
 
     login({usernameOrEmail: username, password})
-      .then(({ data: { status } }) => {
-        if (status === "ok") {
+      .then((data) => {
+        if (data.status === "ok") {
+          setToken(data.token);
+          setUsername(data.username);
+          setStatus({ type: "success", msg: "Logged in successfully." });
           toEditor();
         } else {
           signUp({ username, email, password })
             .then((res) => {
               login({ usernameOrEmail: username, password })
-                .then(({ data: { status, token, username } }) => {
+                .then((data) => {
+                  setToken(data.token);
+                  setUsername(data.username);
+                  setStatus({ type: "success", msg: "Logged in successfully." });
                   toEditor();
                 })
                 .catch((err) => {
                   // unexpected error
+                  setStatus({ type: "error", msg: "Second login failed." });
                 })
             })
             .catch((err) => {
               // unexpected error
+              setStatus({ type: "error", msg: "Sign up failed." });
             })
         }
       })
       .catch((err) => {
         // unexpected error
+        console.log(err);
+        setStatus({ type: "error", msg: "First login failed." });
       })
   };
   const googleLoginFailure = () => {
-
+    // unexpected error
+    setStatus({ type: "error", msg: "Google login failed." });
   };
 
   return (
@@ -189,6 +210,8 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
             onSuccess={googleLoginSuccess}
             onFailure={googleLoginFailure}
             cookiePolicy={'single_host_origin'}
+            // uxMode="redirect"
+            // redirectUri="http://localhost:3000"
             render={(renderProps) => {
               return (
                 <div>

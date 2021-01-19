@@ -16,6 +16,7 @@ import {
 } from "./axios";
 
 import EmailList from "./component/EmailList";
+import ContentList from "./component/ContentList";
 
 const EditorPage = ({
   username,
@@ -41,10 +42,10 @@ const EditorPage = ({
       } else if (status === "token invalid") {
         setStatus({ type: "error", msg: "Token is invalid." })
       } else {
-        // unknown error
+        // unexpected error
       }
     })();
-  }, [token, setStatus]);
+  }, [token]);
 
   useEffect(() => {
     if (currentEmail !== -1) {
@@ -54,7 +55,7 @@ const EditorPage = ({
           setContentList(content);
           setCurrentContent(-1);
         } else {
-          // unknown error
+          // unexpected error
         }
       })();
     }
@@ -68,7 +69,7 @@ const EditorPage = ({
       setCreateAddress("");
       setCreatePassword("");
     } else {
-      // unknown error
+      // unexpected error
     }
   };
 
@@ -84,7 +85,7 @@ const EditorPage = ({
     } else if (status === "token/emailId invalid") {
       setStatus({ type: "success", msg: "Token/EmailId is invalid." });
     } else {
-      // unknown error
+      // unexpected error
     }
   };
 
@@ -98,7 +99,7 @@ const EditorPage = ({
         setCurrentEmail(-1);
         setStatus({ type: "success", msg: "Email was deleted." });
       } else {
-        // unknown error
+        // unexpected error
       }
     }
   };
@@ -109,7 +110,7 @@ const EditorPage = ({
       setContentList([...contentList, { id, subject }]);
       setStatus({ type: "success", msg: "Content was added." });
     } else {
-      // unknown error
+      // unexpected error
     }
   };
 
@@ -124,6 +125,9 @@ const EditorPage = ({
   useEffect(() => {
     if (currentContent !== -1) {
       handleGetContent();
+    } else {
+      setSubject("");
+      setText("");
     }
   }, [currentContent]);
 
@@ -138,7 +142,7 @@ const EditorPage = ({
     if (status === "ok") {
       setStatus({type: "success", msg: "Content was updated."})
     } else {
-      // unknown error
+      // unexpected error
     }
   };
 
@@ -152,7 +156,7 @@ const EditorPage = ({
         setCurrentContent(-1);
         setStatus({ type: "success", msg: "Content was deleted." })
       } else {
-        // unknown error
+        // unexpected error
       }
     }
   }
@@ -178,6 +182,14 @@ const EditorPage = ({
         handleAddEmail={handleAddEmail}
         handleUpdateEmail={handleUpdateEmail}
         handleDeleteEmail={handleDeleteEmail}
+      />
+      <ContentList
+        contentList={ContentList}
+        currentContent={currentContent}
+        setCurrentContent={(currentContent) => setCurrentContent(currentContent)}
+        handleAddContent={handleAddContent}
+        handleGetContent={handleGetContent}
+        handleDeleteContent={handleDeleteContent}
       />
     </Box>
   );

@@ -1,14 +1,109 @@
 import { useState, useEffect } from "react";
+
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import InputBase from "@material-ui/core/InputBase";
+import { fade, makeStyles } from "@material-ui/core/styles";
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
+import SearchIcon from "@material-ui/icons/Search";
+import AccountCircle from '@material-ui/icons/AccountCircle';
+import IconButton from '@material-ui/core/IconButton';
+
 import LoginPage from "./LoginPage";
 import SignUpPage from "./SignUpPage";
 import EditorPage from "./EditorPage";
 import { message } from "antd";
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1
+  },
+  menuButton: {
+    marginRight: theme.spacing(2)
+  },
+  title: {
+    color: "#3e7bbc",
+    flexGrow: 1,
+    display: "none",
+    [theme.breakpoints.up("sm")]: {
+      display: "block"
+    }
+  },
+  search: {
+    color: "#4e8bcc",
+    position: "relative",
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+    "&:hover": {
+      backgroundColor: fade(theme.palette.common.white, 0.25)
+    },
+    marginLeft: 0,
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      marginLeft: theme.spacing(1),
+      width: "auto"
+    }
+  },
+  searchIcon: {
+    padding: theme.spacing(0, 2),
+    height: "100%",
+    position: "absolute",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  inputRoot: {
+    color: "inherit"
+  },
+  inputInput: {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+    transition: theme.transitions.create("width"),
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      width: "12ch",
+      "&:focus": {
+        width: "20ch"
+      }
+    }
+  }
+}));
 
 const App = () => {
   const [page, setPage] = useState("login");
   const [token, setToken] = useState("");
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState({});
+  const [timeoutId, setTimeoutId] = useState(null);
+
+  useEffect(() => {
+    const localState = JSON.parse(localStorage.getItem("localState"));
+    if (localState) {
+      setPage(localState.page);
+      setToken(localState.token);
+      setUsername(localState.username);
+    } else {
+      localStorage.setItem("localState", JSON.stringify({ page, token, username }));
+    }
+    setTimeoutId(setTimeout(() => {
+      localStorage.removeItem("localState");
+      setTimeoutId(null);
+    }, 5 * 60 * 1000));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("localState", JSON.stringify({ page, token, username }));
+    if (timeoutId)
+      clearTimeout(timeoutId);
+    setTimeoutId(setTimeout(() => {
+      localStorage.removeItem("localState");
+      setTimeoutId(null);
+    }, 5 * 60 * 1000));
+  }, [page, token, username]);
 
   const displayStatus = (s) => {
     if (s.msg) {
@@ -33,28 +128,120 @@ const App = () => {
     }
   }
 
+  const MainAppBar = () => {
+    const classes = useStyles();
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleMenu = (event) => {
+      setAnchorEl(event.currentTarget);
+    }
+  
+    const handleClose = () => {
+      setAnchorEl(null);
+    }
+  
+    return (
+      <AppBar style={{ background: "rgb(216,234,245)", marginBottom: "1%" }} position="static">
+        <Toolbar>
+          <img
+            alt="logo-img-main"
+            src="http://abclabs.csie.org/automail/images/logo.png"
+            width="50px"
+          />
+          <Typography className={classes.title} variant="h6" noWrap>
+            &nbsp;&nbsp;Pigeons
+          </Typography>
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <SearchIcon />
+            </div>
+            <InputBase
+              placeholder="Search…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput
+              }}
+              inputProps={{ "aria-label": "search" }}
+            />
+          </div>
+          {
+            token !== "" ?
+            <div style={{ marginLeft: "1%", color: "#3e7bbc" }}>
+              Welcome, {username.slice(0, username.length < 10 ? username.length : 10) + (username.length < 10 ? "" : " ...") }
+              <IconButton
+                edge="end"
+                aria-label="account of current user"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={open}
+                onClose={handleClose}
+              >
+                {/* <MenuItem onClick={handleClose}></MenuItem> */}
+                <MenuItem style={{ justifyContent: "flex-end" }} onClick={() => {setPage("login"); setToken("")}}>Log out</MenuItem>
+              </Menu>
+            </div> :
+            <></>
+          } 
+        </Toolbar>
+      </AppBar>
+    )
+  }
+
   useEffect(() => {
     displayStatus(status);
   }, [status])
 
   if (page === "signUp") {
-    return <SignUpPage
-      toLogin={() => setPage("login")}
-    />
+    return (
+      <div>
+        <MainAppBar/>
+        <SignUpPage
+          toLogin={() => setPage("login")}
+          setStatus={(status) => setStatus(status)}
+        />
+      </div>
+    );
   } else if (page === "editor") {
-    return <EditorPage
-      username={username}
-      token={token}
-      setStatus={(status) => setStatus(status)}
-    />
+    return (
+      <div>
+        <MainAppBar/>
+        <EditorPage
+          username={username}
+          token={token}
+          setStatus={(status) => setStatus(status)}
+        />
+      </div>
+    );
   } else {
-    return <LoginPage
-      toSignUp={() => setPage("signUp")}
-      toEditor={() => setPage("editor")}
-      setToken={(token) => setToken(token)}
-      setUsername={(username) => setUsername(username)}
-      setStatus={(status) => setStatus(status)}
-    />
+    return (
+      <div>
+        <MainAppBar/>
+        <LoginPage
+          toSignUp={() => setPage("signUp")}
+          toEditor={() => setPage("editor")}
+          setToken={(token) => setToken(token)}
+          setUsername={(username) => setUsername(username)}
+          setStatus={(status) => setStatus(status)}
+        />
+      </div>
+    );
   }
 }
 
