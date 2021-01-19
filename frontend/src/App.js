@@ -93,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const App = () => {
-  const [page, setPage] = useState("login");
+  const [page, setPage] = useState("");
   const [token, setToken] = useState("");
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState({});
@@ -116,7 +116,7 @@ const App = () => {
       setToken(localState.token);
       setUsername(localState.username);
     } else {
-      localStorage.setItem("localState", JSON.stringify({ page, token, username }));
+      localStorage.setItem("localState", JSON.stringify({ page: "login", token, username }));
     }
     setTimeoutId(setTimeout(() => {
       localStorage.removeItem("localState");
@@ -248,6 +248,7 @@ const App = () => {
         <div style={{ paddingTop: "1%", paddingLeft: (size[0] / size[1] > 1.0) ? ((size[0] / size[1] - 1.0) * 55).toString() + "%" : "0%" }}>
           <SignUpPage
             toLogin={() => setPage("login")}
+            setStatus={(status) => setStatus(status)}
           />
         </div>
         <Box mt={5}>
@@ -255,7 +256,7 @@ const App = () => {
         </Box>
       </div>
     )
-  } else if (page === "editor") {
+  } else if (page === "editor" && token !== "") {
     return (
       <div>
         <MainAppBar/>
@@ -266,7 +267,7 @@ const App = () => {
         />
       </div>
     )
-  } else {
+  } else if (page === "login") {
     return (
       <div style={{ backgroundImage: `url(${backgroundImage})`, height: "100vh" }}>
         <MainAppBar/>
@@ -283,6 +284,10 @@ const App = () => {
           <Copyright />
         </Box>
       </div>
+    )
+  } else {
+    return (
+      <></>
     )
   }
 }

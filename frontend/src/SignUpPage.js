@@ -52,15 +52,24 @@ const SignUpPage = ({ toLogin, setStatus }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [usernameError, setUsernameError] = useState(false);
-  const [emailError, setEmailError] = useState(false);
-  const [passwordError, setPasswordError] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [usernameError, setUsernameError] = useState(false)
+  const [emailError, setEmailError] = useState(false)
+  const [passwordError, setPasswordError] = useState(false)
+  const [confirmPasswordError, setConfirmPasswordError] = useState(false)
 
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
+  const confirmPasswordRef = useRef(null);
 
   const handleSignUp = async () => {
-    if (username !== "" && email !== "" && password !== "") {
+    if (username !== "" && email !== "" && password !== "" && confirmPassword !== "") {
+      if (password !== confirmPassword) {
+        setConfirmPasswordError(true);
+        setStatus({ type: "error", msg: "Password is not matched." });
+        return
+      } else
+        setConfirmPasswordError(false);
       const { status } = await signUp({ username, email, password });
       if (status === "ok") {
         setStatus({ type: "success", msg: "Signed up successfully." });
@@ -99,6 +108,13 @@ const SignUpPage = ({ toLogin, setStatus }) => {
         errorMsg += "Password is required.";
       } else
         setPasswordError(false);
+      if (confirmPassword === "") {
+          setConfirmPasswordError(true);
+          if (errorMsg !== "")
+            errorMsg += " ";
+          errorMsg += "Password confirm is required.";
+      } else
+        setConfirmPasswordError(false);
       setStatus({ type: "error", msg: errorMsg });
     }
   }
@@ -116,7 +132,7 @@ const SignUpPage = ({ toLogin, setStatus }) => {
         <Container className={classes.form}>
           <TextField
             variant="outlined"
-            margin="normal"
+            margin="small"
             required
             fullWidth
             id="username"
@@ -133,9 +149,10 @@ const SignUpPage = ({ toLogin, setStatus }) => {
             autoFocus
             // autoComplete="fname"
           />
+          <div style={{ height: "1vh" }}></div>
           <TextField
             variant="outlined"
-            margin="normal"
+            margin="small"
             required
             fullWidth
             id="email"
@@ -152,9 +169,10 @@ const SignUpPage = ({ toLogin, setStatus }) => {
             error={emailError}
             // autoComplete="email"
           />
+          <div style={{ height: "1vh" }}></div>
           <TextField
             variant="outlined"
-            margin="normal"
+            margin="small"
             required
             fullWidth
             id="password"
@@ -166,11 +184,31 @@ const SignUpPage = ({ toLogin, setStatus }) => {
             inputRef={passwordRef}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                handleSignUp();
+                confirmPasswordRef.current.focus();
               }
             }}
             error={passwordError}
             // autoComplete="current-password"
+          />
+          <div style={{ height: "1vh" }}></div>
+          <TextField
+            variant="outlined"
+            margin="small"
+            required
+            fullWidth
+            id="confirm password"
+            name="confirm password"
+            label="confirm password"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => { setConfirmPassword(e.target.value); }}
+            inputRef={confirmPasswordRef}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSignUp();
+              }
+            }}
+            error={confirmPasswordError}
           />
           <Button
             type="submit"
