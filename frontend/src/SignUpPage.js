@@ -129,9 +129,9 @@ const SignUpPage = ({ toLogin, setStatus }) => {
             fullWidth
             id="username"
             name="username"
-            label="username"
+            label="Username"
             value={username}
-            onChange={(e) => { setUsername(e.target.value); }}
+            onChange={(e) => setUsername(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 emailRef.current.focus();

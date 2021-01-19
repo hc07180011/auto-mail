@@ -4,7 +4,6 @@ const ContentList = ({
   contentList,
   currentContent,
   setCurrentContent,
-  handleAddContent,
   handleGetContent,
   handleDeleteContent,
 }) => {

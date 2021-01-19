@@ -17,6 +17,7 @@ import {
 
 import EmailList from "./component/EmailList";
 import ContentList from "./component/ContentList";
+import Editor from "./component/Editor";
 
 const EditorPage = ({
   username,
@@ -108,6 +109,7 @@ const EditorPage = ({
     const { status, id } = await addContent({ token, emailId: emailList[currentEmail].id, subject, text });
     if (status === "ok") {
       setContentList([...contentList, { id, subject }]);
+      setCurrentContent(contentList.length - 1);
       setStatus({ type: "success", msg: "Content was added." });
     } else {
       // unexpected error
@@ -187,9 +189,18 @@ const EditorPage = ({
         contentList={ContentList}
         currentContent={currentContent}
         setCurrentContent={(currentContent) => setCurrentContent(currentContent)}
-        handleAddContent={handleAddContent}
         handleGetContent={handleGetContent}
         handleDeleteContent={handleDeleteContent}
+      />
+      <Editor
+        currentContent={currentContent}
+        subject={subject}
+        setSubject={(subject) => setSubject(subject)}
+        text={text}
+        setText={(text) => setText(text)}
+        handleAddContent={handleAddContent}
+        handleUpdateContent={handleUpdateContent}
+        handleDeliver={handleDeliver}
       />
     </Box>
   );
