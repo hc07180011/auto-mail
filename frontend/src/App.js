@@ -98,25 +98,17 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState({});
   const [timeoutId, setTimeoutId] = useState(null);
-  
-  const [size, setSize] = useState([0, 0]);
-  useLayoutEffect(() => {
-    function updateSize() {
-      setSize([window.innerWidth, window.innerHeight])
-    }
-    window.addEventListener('resize', updateSize);
-    updateSize();
-    return () => window.removeEventListener('resize', updateSize);
-  }, []);
 
   useEffect(() => {
     const localState = JSON.parse(localStorage.getItem("localState"));
+    console.log(localState)
     if (localState) {
       setPage(localState.page);
       setToken(localState.token);
       setUsername(localState.username);
     } else {
-      localStorage.setItem("localState", JSON.stringify({ page: "login", token, username }));
+      localStorage.setItem("localState", JSON.stringify({ page: "login", token: "", usernme: "" }));
+      setPage("login")
     }
     setTimeoutId(setTimeout(() => {
       localStorage.removeItem("localState");
@@ -125,7 +117,9 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("localState", JSON.stringify({ page, token, username }));
+    if (page !== "") {
+      localStorage.setItem("localState", JSON.stringify({ page, token, username }));
+    }
     if (timeoutId)
       clearTimeout(timeoutId);
     setTimeoutId(setTimeout(() => {
@@ -173,11 +167,14 @@ const App = () => {
     return (
       <AppBar style={{ background: "rgb(216,234,245)", marginBottom: "1%" }} position="static">
           <Toolbar>
-            <img
-              alt="logo-img-main"
-              src={logo}
-              width="50px"
-            />
+            <a href="http://abclabs.csie.org/automail/">
+              <img
+                alt="logo-img-main"
+                src={logo}
+                
+                width="50px"
+              />
+            </a>
             <Typography className={classes.title} variant="h6" noWrap>
               &nbsp;&nbsp;Pigeons
             </Typography>
@@ -225,7 +222,7 @@ const App = () => {
                       onClose={handleClose}
                     >
                       {/* <MenuItem onClick={handleClose}></MenuItem> */}
-                      <MenuItem style={{ justifyContent: "flex-end" }} onClick={() => {setPage("login"); setToken("")}}>Log out</MenuItem>
+                      <MenuItem style={{ justifyContent: "flex-end" }} onClick={() => {setPage("login"); setToken(""); setUsername("")}}>Log out</MenuItem>
                     </Menu>
                   </Button>
                 </label>
@@ -243,15 +240,18 @@ const App = () => {
 
   if (page === "signUp") {
     return (
-      <div style={{ backgroundImage: `url(${backgroundImage})`, height: "100vh" }}>
-        <MainAppBar/>
-        <div style={{ paddingTop: "1%", paddingLeft: (size[0] / size[1] > 1.0) ? ((size[0] / size[1] - 1.0) * 55).toString() + "%" : "0%" }}>
+      <div>
+        <div style={{ position: "fixed", top: 0, width: "100%", zIndex: 950 }}>
+          <MainAppBar />
+        </div>
+        <div style={{ backgroundImage: `url(${backgroundImage})`, position: "fixed", bottom: 0, top: 0, width: "100%", zIndex: -1 }}></div>
+        <div style={{ float: "right", paddingTop: "7%", paddingBottom: "2%", paddingRight: "8%", paddingLeft: "8%" }}>
           <SignUpPage
             toLogin={() => setPage("login")}
             setStatus={(status) => setStatus(status)}
           />
         </div>
-        <Box mt={5}>
+        <Box mt={8} style={{ backgroundColor: "rgb(216,234,245)", position: "fixed", bottom: "0%", width: "100%", zIndex: 950 }}>
           <Copyright />
         </Box>
       </div>
@@ -269,9 +269,12 @@ const App = () => {
     )
   } else if (page === "login") {
     return (
-      <div style={{ backgroundImage: `url(${backgroundImage})`, height: "100vh" }}>
-        <MainAppBar/>
-        <div style={{ paddingTop: "1%", paddingLeft: (size[0] / size[1] > 1.0) ? ((size[0] / size[1] - 1.0) * 55).toString() + "%" : "0%"}}>
+      <div>
+        <div style={{ position: "fixed", top: 0, width: "100%", zIndex: 950 }}>
+          <MainAppBar />
+        </div>
+        <div style={{ backgroundImage: `url(${backgroundImage})`, position: "fixed", bottom: 0, top: 0, width: "100%", zIndex: -1 }}></div>
+        <div style={{ float: "right", paddingTop: "7%", paddingBottom: "2%", paddingRight: "8%", paddingLeft: "8%" }}>
           <LoginPage
             toSignUp={() => setPage("signUp")}
             toEditor={() => setPage("editor")}
@@ -280,7 +283,7 @@ const App = () => {
             setStatus={(status) => setStatus(status)}
           />
         </div>
-        <Box mt={8}>
+        <Box mt={8} style={{ backgroundColor: "rgb(216,234,245)", position: "fixed", bottom: "0%", width: "100%", zIndex: 950 }}>
           <Copyright />
         </Box>
       </div>

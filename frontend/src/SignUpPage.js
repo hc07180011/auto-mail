@@ -198,7 +198,7 @@ const SignUpPage = ({ toLogin, setStatus }) => {
             fullWidth
             id="confirm password"
             name="confirm password"
-            label="confirm password"
+            label="Confirm password"
             type="password"
             value={confirmPassword}
             onChange={(e) => { setConfirmPassword(e.target.value); }}
