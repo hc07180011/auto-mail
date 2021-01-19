@@ -35,6 +35,8 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1, 0, 1),
   },
   signup: {
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
     textDecoration: 'none',
     '&:hover': {
       textDecoration: "underline",

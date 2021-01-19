@@ -102,9 +102,7 @@ const App = () => {
   const [size, setSize] = useState([0, 0]);
   useLayoutEffect(() => {
     function updateSize() {
-      setSize([window.innerWidth, window.innerHeight]);
-      console.log(window.innerWidth, window.innerHeight)
-      console.log(((size[0] / size[1] - 1.0) * 39.685).toString() + "%")
+      setSize([window.innerWidth, window.innerHeight])
     }
     window.addEventListener('resize', updateSize);
     updateSize();
@@ -247,10 +245,12 @@ const App = () => {
     return (
       <div style={{ backgroundImage: `url(${backgroundImage})`, height: "100vh" }}>
         <MainAppBar/>
-        <SignUpPage
-          toLogin={() => setPage("login")}
-        />
-        <Box mt={9}>
+        <div style={{ paddingTop: "1%", paddingLeft: (size[0] / size[1] > 1.0) ? ((size[0] / size[1] - 1.0) * 55).toString() + "%" : "0%" }}>
+          <SignUpPage
+            toLogin={() => setPage("login")}
+          />
+        </div>
+        <Box mt={5}>
           <Copyright />
         </Box>
       </div>
@@ -270,7 +270,7 @@ const App = () => {
     return (
       <div style={{ backgroundImage: `url(${backgroundImage})`, height: "100vh" }}>
         <MainAppBar/>
-        <div style={{ paddingLeft: (size[0] / size[1] > 1.0) ? ((size[0] / size[1] - 1.0) * 39.685).toString() + "%" : "0%"}}>
+        <div style={{ paddingTop: "1%", paddingLeft: (size[0] / size[1] > 1.0) ? ((size[0] / size[1] - 1.0) * 55).toString() + "%" : "0%"}}>
           <LoginPage
             toSignUp={() => setPage("signUp")}
             toEditor={() => setPage("editor")}
@@ -279,7 +279,7 @@ const App = () => {
             setStatus={(status) => setStatus(status)}
           />
         </div>
-        <Box mt={14}>
+        <Box mt={8}>
           <Copyright />
         </Box>
       </div>
