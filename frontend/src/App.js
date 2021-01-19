@@ -101,7 +101,6 @@ const App = () => {
 
   useEffect(() => {
     const localState = JSON.parse(localStorage.getItem("localState"));
-    console.log(localState)
     if (localState) {
       setPage(localState.page);
       setToken(localState.token);

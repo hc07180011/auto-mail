@@ -129,7 +129,6 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
       })
       .catch((err) => {
         // unexpected error
-        console.log(err);
         setStatus({ type: "error", msg: "First login failed." });
       })
   };
