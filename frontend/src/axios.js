@@ -1,7 +1,6 @@
 import axios from 'axios'
 
-const baseURL = "http://api.automail.henrychao.me";
-// const baseURL = "http://ntuai.csie.org:4000";
+const baseURL = "https://api-pigeons.herokuapp.com/";
 const instance = axios.create({ baseURL: baseURL });
 
 const login = async (req) => {

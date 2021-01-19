@@ -2,7 +2,7 @@
   "name": "auto-mail",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/automail/core",
+  "homepage": "/",
   "main": "./electron/main.js",
   "dependencies": {
     "@material-ui/core": "^4.11.2",
