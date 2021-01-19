@@ -44,8 +44,23 @@ const getContentList = async (req) => {
   return data;
 }
 
-const getEmailDetail = async (req) => {
+const getContent = async (req) => {
   const { data } = await instance.post("/content/detail/read", req);
+  return data;
+}
+
+const updateContent = async (req) => {
+  const { data } = await instance.post("/content/detail/update", req);
+  return data;
+}
+
+const deleteContent = async (req) => {
+  const { data } = await instance.post("/content/delete", req);
+  return data;
+}
+
+const deliver = async (req) => {
+  const { data } = await instance.post("/deliver/create", req);
   return data;
 }
 
@@ -58,5 +73,8 @@ export {
   deleteEmail,
   addContent,
   getContentList,
-  getEmailDetail,
+  getContent,
+  updateContent,
+  deleteContent,
+  deliver,
 };

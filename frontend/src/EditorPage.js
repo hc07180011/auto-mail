@@ -1,3 +1,6 @@
+import Box from "@material-ui/core/Box";
+import Container from "@material-ui/core/Container";
+
 import { useEffect, useState } from "react";
 import {
   addEmail,
@@ -6,8 +9,13 @@ import {
   deleteEmail,
   addContent,
   getContentList,
-  getEmailDetail,
+  getContent,
+  updateContent,
+  deleteContent,
+  deliver,
 } from "./axios";
+
+import EmailList from "./component/EmailList";
 
 const EditorPage = ({
   username,
@@ -27,7 +35,7 @@ const EditorPage = ({
 
   useEffect(() => {
     (async function() {
-      const { status, email } = getEmailList({ token });
+      const { status, email } = await getEmailList({ token });
       if (status === "ok") {
         setEmailList(email);
       } else if (status === "token invalid") {
@@ -36,12 +44,12 @@ const EditorPage = ({
         // unknown error
       }
     })();
-  }, []);
+  }, [token, setStatus]);
 
   useEffect(() => {
     if (currentEmail !== -1) {
       (async function () {
-        const { status, content } = getContentList({ token, emailId: emailList[currentEmail].id });
+        const { status, content } = await getContentList({ token, emailId: emailList[currentEmail].id });
         if (status === "ok") {
           setContentList(content);
           setCurrentContent(-1);
@@ -53,24 +61,26 @@ const EditorPage = ({
   }, [currentEmail]);
 
   const handleAddEmail = async () => {
-    const { status, id } = await addEmail({ token, createAddress, createPassword });
+    const { status, id } = await addEmail({ token, address: createAddress, password: createPassword });
     if (status === "ok") {
-      setEmailList([...emailList, { id, createAddress, status: true }]);
+      setEmailList([...emailList, { id, address: createAddress, status: true }]);
       setStatus({ type: "success", msg: "Email was added." });
+      setCreateAddress("");
+      setCreatePassword("");
     } else {
       // unknown error
     }
   };
 
   const handleUpdateEmail = async (index) => {
-    setUpdateAddress("");
-    setUpdatePassword("");
     const { status } = await updateEmail({ token, emailId: emailList[index].id, updateAddress, updatePassword });
     if (status === "ok") {
       let newEmailList = emailList;
       newEmailList[index].address = updateAddress;
       setEmailList(newEmailList);
       setStatus({ type: "success", msg: "Email information was updated." });
+      setUpdateAddress("");
+      setUpdatePassword("");
     } else if (status === "token/emailId invalid") {
       setStatus({ type: "success", msg: "Token/EmailId is invalid." });
     } else {
@@ -78,19 +88,18 @@ const EditorPage = ({
     }
   };
 
-  const handleDeleteEmail = async (index) => {
-    const { status } = await deleteEmail({ token, emailId: emailList[index].id });
-    if (status === "ok") {
-      let newEmailList = emailList;
-      newEmailList.splice(index, 1);
-      setEmailList(newEmailList);
-      if (index < currentEmail)
-        setCurrentEmail(currentEmail - 1);
-      else if (index === currentEmail)
+  const handleDeleteEmail = async () => {
+    if (currentEmail !== -1) {
+      const { status } = await deleteEmail({ token, emailId: emailList[currentEmail].id });
+      if (status === "ok") {
+        let newEmailList = emailList;
+        newEmailList.splice(currentEmail, 1);
+        setEmailList(newEmailList);
         setCurrentEmail(-1);
-      setStatus({ type: "success", msg: "Email was deleted." });
-    } else {
-      // unknown error
+        setStatus({ type: "success", msg: "Email was deleted." });
+      } else {
+        // unknown error
+      }
     }
   };
 
@@ -104,18 +113,73 @@ const EditorPage = ({
     }
   };
 
-  const handleShowEmail = async () => {
-    const { status, subject, text } = await getEmailDetail({ token, emailId: emailList[currentEmail].id, contentId: contentList[currentContent].id });
+  const handleGetContent = async () => {
+    const { status, subject, text } = await getContent({ token, emailId: emailList[currentEmail].id, contentId: contentList[currentContent].id });
     if (status === "ok") {
       setSubject(subject);
       setText(text);
+    } 
+  };
+
+  useEffect(() => {
+    if (currentContent !== -1) {
+      handleGetContent();
+    }
+  }, [currentContent]);
+
+  const handleUpdateContent = async () => {
+    const { status } = await updateContent({
+      token,
+      emailId: emailList[currentEmail].id,
+      contentId: contentList[currentContent].id,
+      subject,
+      text,
+    });
+    if (status === "ok") {
+      setStatus({type: "success", msg: "Content was updated."})
+    } else {
+      // unknown error
     }
   };
 
-  return (
-    <div>
+  const handleDeleteContent = async () => {
+    if (currentContent !== -1) {
+      const { status } = await deleteContent({ token, emailId: emailList[currentEmail].id, contentId: contentList[currentContent].id });
+      if (status === "ok") {
+        let newContentList = contentList;
+        newContentList.splice(currentContent, 1);
+        setContentList(newContentList);
+        setCurrentContent(-1);
+        setStatus({ type: "success", msg: "Content was deleted." })
+      } else {
+        // unknown error
+      }
+    }
+  }
 
-    </div>
+  const handleDeliver = async () => {
+
+  }
+
+  return (
+    <Box>
+      <EmailList
+        emailList={emailList}
+        currentEmail={currentEmail}
+        setCurrentEmail={(currentEmail) => setCurrentEmail(currentEmail)}
+        createAddress={createAddress}
+        setCreateAddress={(createAddress) => setCreateAddress(createAddress)}
+        createPassword={createPassword}
+        setCreatePassword={(createPassword) => setCreatePassword(createPassword)}
+        updateAddress={updateAddress}
+        setUpdateAddress={(updateAddress) => setUpdateAddress(updateAddress)}
+        updatePassword={updatePassword}
+        setUpdatePassword={(updatePassword) => setCreatePassword(updatePassword)}
+        handleAddEmail={handleAddEmail}
+        handleUpdateEmail={handleUpdateEmail}
+        handleDeleteEmail={handleDeleteEmail}
+      />
+    </Box>
   );
 };
 
