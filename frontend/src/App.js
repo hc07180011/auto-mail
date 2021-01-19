@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useEffect } from "react";
 
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -166,7 +166,7 @@ const App = () => {
     return (
       <AppBar style={{ background: "rgb(216,234,245)", marginBottom: "1%" }} position="static">
           <Toolbar>
-            <a href="http://abclabs.csie.org/automail/">
+            <a id="welcomePage" href="/welcome">
               <img
                 alt="logo-img-main"
                 src={logo}
@@ -174,7 +174,7 @@ const App = () => {
                 width="50px"
               />
             </a>
-            <Typography className={classes.title} variant="h6" noWrap>
+            <Typography className={classes.title} variant="h6" noWrap onClick={() => {window.location.replace("/welcome")}} style={{ cursor: "pointer" }}>
               &nbsp;&nbsp;Pigeons
             </Typography>
             <div className={classes.search} display="none">
