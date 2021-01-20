@@ -9,7 +9,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useState, useRef } from "react";
 import { login, signUp } from "./axios";
-import GoogleLogin from "react-google-login"
+import GoogleLogin from "react-google-login";
+import { Puff } from '@agney/react-loading';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -50,12 +51,16 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
   const [password, setPassword] = useState("");
   const [usernameOrEmailError, setUsernameOrEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+
+  const [isLoading, setLoading] = useState(false);
   
   const passwordRef = useRef(null);
 
   const handleSubmit = async () => {
     if (usernameOrEmail !== "" && password !== "") {
+      setLoading(true)
       const { status, token, username } = await login({ usernameOrEmail, password });
+      setLoading(false)
       if (status === "ok") {
         setStatus({ type: "success", msg: "Logged in successfully." });
         setToken(token);
@@ -97,9 +102,11 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
     const email = res.profileObj.email;
     const password = res.googleId;
 
+    setLoading(true)
     login({usernameOrEmail: username, password})
       .then((data) => {
         if (data.status === "ok") {
+          setLoading(false)
           setToken(data.token);
           setUsername(data.username);
           setStatus({ type: "success", msg: "Logged in successfully." });
@@ -109,6 +116,7 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
             .then((res) => {
               login({ usernameOrEmail: username, password })
                 .then((data) => {
+                  setLoading(false)
                   setToken(data.token);
                   setUsername(data.username);
                   setStatus({ type: "success", msg: "Logged in successfully." });
@@ -116,22 +124,26 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
                 })
                 .catch((err) => {
                   // unexpected error
+                  setLoading(false)
                   setStatus({ type: "error", msg: "Second login failed." });
                 })
             })
             .catch((err) => {
               // unexpected error
+              setLoading(false)
               setStatus({ type: "error", msg: "Sign up failed." });
             })
         }
       })
       .catch((err) => {
         // unexpected error
+        setLoading(false)
         setStatus({ type: "error", msg: "First login failed." });
       })
   };
   const googleLoginFailure = (error) => {
     // unexpected error
+    setLoading(false)
     if (error.error === "idpiframe_initialization_failed") {
       setStatus({ type: "error", msg: "IP blocked." });
       return
@@ -144,7 +156,7 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
+          { isLoading ? <Puff width="50" /> : <LockOutlinedIcon /> }
         </Avatar>
         <Typography component="h1" variant="h5">
           Log in
@@ -192,6 +204,7 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
             fullWidth
             variant="contained"
             color="primary"
+            disabled={isLoading ? "true" : ""}
             className={classes.submit}
             onClick={handleSubmit}
           >
@@ -213,6 +226,7 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
                     fullWidth
                     variant="contained"
                     color=""
+                    disabled={isLoading ? "true" : ""}
                     className={classes.submit}
                     onClick={renderProps.onClick}
                   >

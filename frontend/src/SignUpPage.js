@@ -7,8 +7,9 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { useState, useRef } from "react"
-import { signUp } from "./axios"
+import { useState, useRef } from "react";
+import { signUp } from "./axios";
+import { Puff } from '@agney/react-loading';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -54,6 +55,8 @@ const SignUpPage = ({ toLogin, setStatus }) => {
   const [passwordError, setPasswordError] = useState(false)
   const [confirmPasswordError, setConfirmPasswordError] = useState(false)
 
+  const [isLoading, setLoading] = useState(false);
+
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
@@ -66,7 +69,9 @@ const SignUpPage = ({ toLogin, setStatus }) => {
         return
       } else
         setConfirmPasswordError(false);
+      setLoading(true)
       const { status } = await signUp({ username, email, password });
+      setLoading(false)
       if (status === "ok") {
         setStatus({ type: "success", msg: "Signed up successfully." });
         toLogin();
@@ -120,7 +125,7 @@ const SignUpPage = ({ toLogin, setStatus }) => {
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
+          { isLoading ? <Puff width="50" /> : <LockOutlinedIcon /> }
         </Avatar>
         <Typography component="h1" variant="h5">
           Sign up
@@ -211,6 +216,7 @@ const SignUpPage = ({ toLogin, setStatus }) => {
             fullWidth
             variant="contained"
             color="primary"
+            disabled={isLoading ? "true" : ""}
             className={classes.submit}
             onClick={handleSignUp}
           >

@@ -14,7 +14,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import IconButton from '@material-ui/core/IconButton';
 
-import logo from './img/logo.png';
+import logo from './img/logo-appBar.png';
 import backgroundImage from './img/background.png';
 
 import LoginPage from "./LoginPage";
@@ -171,13 +171,13 @@ const App = () => {
                 alt="logo-img-main"
                 src={logo}
                 
-                width="50px"
+                width="150px"
               />
             </a>
-            <Typography className={classes.title} variant="h6" noWrap onClick={() => {window.location.replace("/welcome/")}} style={{ cursor: "pointer" }}>
-              &nbsp;&nbsp;Pigeons
+            <Typography className={classes.title} variant="h6" noWrap>
+              &nbsp;
             </Typography>
-            <div className={classes.search} display="none">
+            <div className={classes.search}>
               <div className={classes.searchIcon}>
                 <SearchIcon />
               </div>
