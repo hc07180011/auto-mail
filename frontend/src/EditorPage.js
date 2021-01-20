@@ -1,9 +1,18 @@
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
+import Paper from "@material-ui/core/Paper";
+import Fab from "@material-ui/core/Fab";
+import DeleteIcon from "@material-ui/icons/Delete";
+import ButtonBase from "@material-ui/core/ButtonBase";
 import { makeStyles } from '@material-ui/core/styles';
 import BraftEditor from "braft-editor";
 
+import GoogleLogin from 'react-google-login';
+import * as XLSX from 'xlsx';
+import Chip from '@material-ui/core/Chip';
+import LocationOnIcon from '@material-ui/icons/LocationOn';
+import copy from 'copy-to-clipboard';
 
 import { useEffect, useState } from "react";
 import {
@@ -30,6 +39,28 @@ const useStyles = makeStyles((theme) => ({
   button: {
     margin: theme.spacing(1),
   },
+
+  paper: {
+    padding: theme.spacing(2),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
+  preview: {
+    fontSize: '10px',
+    padding: theme.spacing(2),
+    margin: 'auto',
+    maxWidth: 500,
+  },
+  image: {
+    width: 32,
+    height: 32,
+  },
+  img: {
+    margin: 'auto',
+    display: 'block',
+    maxWidth: '100%',
+    maxHeight: '100%',
+  },
 }));
 
 const EditorPage = ({
@@ -50,7 +81,10 @@ const EditorPage = ({
   const [currentContent, setCurrentContent] = useState(-1);
   const [subject, setSubject] = useState("");
   const [braftEditorState, setBraftEditorState] = useState(BraftEditor.createEditorState(null));
-  const [files, setFiles] = useState([]);
+  const [attachments, setAttachments] = useState([]);
+  const [excelData, setExcelData] = useState([]);
+  const [recipientData, setRecipientData] = useState(["", "", ""]);
+  const [copyData, setCopyData] = useState("");
 
   useEffect(() => {
     (async function () {
@@ -242,8 +276,8 @@ const EditorPage = ({
   }
 
   useEffect(() => {
-    console.log(files);
-  }, [files]);
+    console.log(excelData);
+  }, [excelData]);
 
   return (
     <>
@@ -284,21 +318,106 @@ const EditorPage = ({
             setSubject={setSubject}
             braftEditorState={braftEditorState}
             setBraftEditorState={setBraftEditorState}
+            copyData={copyData}
+            setCopyData={setCopyData}
+            recipientData={recipientData}
+            setRecipientData={setRecipientData}
           />
         </Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}></Grid>
+        <Grid item xs={12}></Grid>
+        <Grid item xs={12}></Grid>
+        <Grid item xs={12}></Grid>
+        <Grid item xs={12}></Grid>
+        <Grid item xs={12}></Grid>
+        <Grid item xs={12}></Grid>
       </Grid>
       <Box mt={8} style={{ backgroundColor: "rgb(216, 234, 245)", position: "fixed", bottom: "0%", width: "100%", zIndex: 950 }}>
-        <Grid container justify="flex-end" spacing={2}>
+        <Grid container justify="flex-end" alignItems="center" spacing={2}>
+          <Grid item>
+            {excelData.length ? excelData[0].map((elem, idx) => (
+              <Chip
+                variant="outlined"
+                color="primary"
+                size="small"
+                label={elem}
+                key={idx}
+                icon={<LocationOnIcon />}
+                onClick={(e) => {
+                  copy(`$[[${elem}]]`);
+                  setCopyData(`$[[${elem}]],`);
+                }}
+                onDelete={() => {
+                  let newExcelData = excelData;
+                  newExcelData[0].splice(idx, 1);
+                  setExcelData(newExcelData);
+                }}
+              />
+            )) : <></>}
+          </Grid>
           <Grid item>
             <Button
+              component="label"
               variant="contained"
               color="primary"
               className={classes.button}
             >
               Recipients
+              <input
+                accept="*"
+                hidden
+                onChange={(e) => {
+                  const reader = new FileReader()
+                  const workSheetIndex = 0
+                  reader.onload = (evt) => { // evt = on_file_select event
+                    /* Parse data */
+                    const bstr = evt.target.result;
+                    const wb = XLSX.read(bstr, {type:'binary'});
+                    /* Get first worksheet */
+                    const wsname = wb.SheetNames[workSheetIndex];
+                    const ws = wb.Sheets[wsname];
+                    /* Convert array of arrays */
+                    let data = XLSX.utils.sheet_to_json(ws, { header: 1 }).filter((elem) => elem.length);
+                    setExcelData(data);
+                  };
+                  reader.readAsBinaryString(e.target.files[0]);
+                }}
+                type="file"
+              />
             </Button>
+          </Grid>
+          <Grid item>
+            <Grid container>
+              {[...attachments].map((f, idx) => (
+                <Paper className={classes.preview}>
+                  <Grid container spacing={2}>
+                    <Grid item>
+                      <ButtonBase className={classes.image}>
+                        <img className={classes.img} alt="preview" src={URL.createObjectURL(f)} />
+                      </ButtonBase>
+                    </Grid>
+                    <Grid item xs={12} sm={6} container>
+                      <Grid item xs container direction="column" spacing={2}>
+                        <Grid item xs>
+                            {f.name}<br></br>
+                            {f.type}
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                      <Fab size="small" color="secondary" aria-label="add">
+                        <DeleteIcon onClick={() => { 
+                          let newAttachments = [...attachments];
+                          newAttachments.splice(idx, 1);
+                          setAttachments(newAttachments);
+                        }}/>
+                      </Fab>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              ))}
+            </Grid>
           </Grid>
           <Grid item>
             <Button
@@ -308,7 +427,7 @@ const EditorPage = ({
               className={classes.button}
             >
               Attachments
-              <input type="file" hidden onChange={(e) => setFiles(e.target.files)}/>
+              <input type="file" multiple hidden onChange={(e) => setAttachments([...attachments, ...e.target.files])}/>
             </Button>
           </Grid>
           <Grid item>

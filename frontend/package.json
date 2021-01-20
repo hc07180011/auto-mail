@@ -14,11 +14,13 @@
     "antd": "^4.10.3",
     "axios": "^0.21.1",
     "braft-editor": "^2.3.9",
+    "copy-to-clipboard": "^3.3.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-google-login": "^5.2.2",
     "react-scripts": "4.0.1",
-    "web-vitals": "^0.2.4"
+    "web-vitals": "^0.2.4",
+    "xlsx": "^0.16.9"
   },
   "scripts": {
     "start": "react-scripts start",

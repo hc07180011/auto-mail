@@ -1,6 +1,8 @@
 import { makeStyles } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import BraftEditor from "braft-editor";
 import "braft-editor/dist/index.css";
 
@@ -20,6 +22,10 @@ const Editor = ({
   setSubject,
   braftEditorState,
   setBraftEditorState,
+  copyData,
+  setCopyData,
+  recipientData,
+  setRecipientData,
 }) => {
   const classes = useStyles();
 
@@ -39,8 +45,21 @@ const Editor = ({
           margin="normal"
           fullWidth
           label="Recipients"
-          value=""
+          value={recipientData[0]}
+          disabled
         />
+        <AddCircleIcon onClick={() => {
+          let newRecipientData = recipientData;
+          newRecipientData[0] += copyData;
+          setRecipientData(newRecipientData);
+          setCopyData("");
+        }} />
+        <RemoveCircleIcon onClick={() => {
+          let newRecipientData = recipientData;
+          newRecipientData[0] = newRecipientData[0].split(copyData).join("");
+          setRecipientData(newRecipientData);
+          setCopyData("");
+        }}/>
       </Grid>
       <Grid item xs={4}>
         <TextField
@@ -48,8 +67,21 @@ const Editor = ({
           margin="normal"
           fullWidth
           label="cc"
-          value=""
+          value={recipientData[1]}
+          disabled
         />
+        <AddCircleIcon onClick={() => {
+          let newRecipientData = recipientData;
+          newRecipientData[1] += copyData;
+          setRecipientData(newRecipientData);
+          setCopyData("");
+        }} />
+        <RemoveCircleIcon onClick={() => {
+          let newRecipientData = recipientData;
+          newRecipientData[1] = newRecipientData[1].split(copyData).join("");
+          setRecipientData(newRecipientData);
+          setCopyData("");
+        }}/>
       </Grid>
       <Grid item xs={4}>
         <TextField
@@ -57,8 +89,21 @@ const Editor = ({
           margin="normal"
           fullWidth
           label="bcc"
-          value=""
+          value={recipientData[2]}
+          disabled
         />
+        <AddCircleIcon onClick={() => {
+          let newRecipientData = recipientData;
+          newRecipientData[2] += copyData;
+          setRecipientData(newRecipientData);
+          setCopyData("");
+        }} />
+        <RemoveCircleIcon onClick={() => {
+          let newRecipientData = recipientData;
+          newRecipientData[2] = newRecipientData[2].split(copyData).join("");
+          setRecipientData(newRecipientData);
+          setCopyData("");
+        }}/>
       </Grid>
       <div className={classes.editor}>
         <BraftEditor
