@@ -129,10 +129,9 @@ router.post('/detail/read', (req, res) => {
       $and: [
         { token: token },
         { "mailList._id": emailId },
-        { "mailList.content._id": contentId },
       ]
     },
-    { "mailList.content.$": 1 }
+    { "mailList.$": 1 }
     )
     .exec((error, response) => {
       if (error) {
