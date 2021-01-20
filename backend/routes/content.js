@@ -184,7 +184,7 @@ router.post('/detail/update', (req, res) => {
     })
     .then((doc) => {
       console.log(doc)
-      if (!doc.mailList || !doc.mailList.length || !doc.mailList[0].content.length) {
+      if (!doc.mailList || !doc.mailList.length) {
         console.log('token/emailId/contentId invalid')
         res.status(200).send({
           status: 'token/emailId/contentId invalid',
