@@ -23,6 +23,7 @@ router.post('/testAlive', (_, res) => {
 router.post('/create', upload.array('attachments', 8), (req, res) => {
 
   try {
+    const productionMode = req.body.productionMode
     const token = req.body.token
     const emailId = req.body.emailId
     const subject = req.body.subject
@@ -73,7 +74,7 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
           const oAuth2Client = new OAuth2(
             '421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com',
             'ZoVhm_48CzhGJfDN2zqjDRj7',
-            'https://pigeons-mail.vercel.app'
+            productionMode === 'true' ? 'https://pigeons-mail.vercel.app' : 'http://localhost:3000',
           )
 
           oAuth2Client
