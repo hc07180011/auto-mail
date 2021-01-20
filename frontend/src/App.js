@@ -132,7 +132,7 @@ const App = () => {
       const { type, msg } = s;
       const content = {
         content: msg,
-        duration: 0.5,
+        duration: 1,
       };
 
       switch (type) {
@@ -141,6 +141,9 @@ const App = () => {
           break;
         case "info":
           message.info(content);
+          break;
+        case "warning":
+          message.warning(content);
           break;
         case "danger":
         default:

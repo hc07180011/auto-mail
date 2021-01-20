@@ -1,23 +1,66 @@
 import { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 import Box from "@material-ui/core/Box";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
+import Typography from '@material-ui/core/Typography';
+import MenuList from '@material-ui/core/MenuList';
+import MenuItem from '@material-ui/core/MenuItem';
+import Paper from '@material-ui/core/Paper';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import EmailIcon from '@material-ui/icons/Email';
 import Button from '@material-ui/core/Button';
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
 import Modal from "@material-ui/core/Modal";
 import TextField from "@material-ui/core/TextField";
+import SettingsIcon from '@material-ui/icons/Settings';
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`vertical-tabpanel-${index}`}
+      aria-labelledby={`vertical-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box p={3}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  value: PropTypes.any.isRequired,
+};
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: '100%',
-    maxWidth: 360,
-    backgroundColor: theme.palette.background.paper,
+    width: 230,
   },
+  paper: {
+    position: 'absolute',
+    width: 400,
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 3, 4),
+  },
+  button:{
+    margin: theme.spacing(1, 0, 1),
+  },
+  addButton:{
+    position: 'absolute',
+    left: 0,
+    bottom: 0,
+  }
 }));
 
 const EmailList = ({
@@ -35,18 +78,20 @@ const EmailList = ({
   handleAddEmail,
   handleUpdateEmail,
   handleDeleteEmail,
+  handleGetContentList,
 }) => {
   const classes = useStyles();
   const [modalStyle] = useState(() => {
     return {
-      top: "50%",
-      left: "50%",
+      top: "10%",
+      left: "35%",
     };
   });
   const [addEmailOpen, setAddEmailOpen] = useState(false);
+  const [settingOpen, setSettingOpen] = useState(false);
 
   const addEmailBody = (
-    <div style={modalStyle}>
+    <div style={modalStyle} className={classes.paper}>
       <TextField
         variant="outlined"
         margin="normal"
@@ -71,11 +116,10 @@ const EmailList = ({
         variant="contained"
         color="primary"
         onClick={() => {
-          if (createAddress !== "" && createPassword !== "") {
-            handleAddEmail();
-            setAddEmailOpen(false);
-          }
+          handleAddEmail();
+          setAddEmailOpen(false);
         }}
+        className={classes.button}
       >
         Add
       </Button>
@@ -88,6 +132,51 @@ const EmailList = ({
           setCreateAddress("");
           setCreatePassword("");
         }}
+        className={classes.button}
+      >
+        Close
+      </Button>
+      <Button
+        fullWidth
+        variant="contained"
+        className={classes.button}
+      >
+        For Google Login
+      </Button>
+    </div>
+  );
+
+  const settingBody = (
+    <div style={modalStyle} className={classes.paper}>
+      <TextField
+        variant="outlined"
+        margin="normal"
+        required
+        fullWidth
+        label="Email Address"
+      />
+      <TextField
+        variant="outlined"
+        margin="normal"
+        required
+        fullWidth
+        label="Password"
+        type="password"
+      />
+      <Button
+        fullWidth
+        variant="contained"
+        color="secondary"
+        className={classes.button}
+      >
+        Update
+      </Button>
+      <Button
+        fullWidth
+        variant="contained"
+        color="secondary"
+        onClick={() => setSettingOpen(false)}
+        className={classes.button}
       >
         Close
       </Button>
@@ -95,42 +184,62 @@ const EmailList = ({
   );
 
   return (
-    <Box className={classes.root}>
-      <List component="nav">
-        {emailList.map((email, index) => (
-          <ListItem
-            button
-            selected={index === currentEmail}
-            onClick={() => setCurrentEmail(index)}
-            key={index}
-          >
-            <ListItemIcon>
-              <EmailIcon />
-            </ListItemIcon>
-            <ListItemText primary={email.address} />
-          </ListItem>
-        ))}
-      </List>
-      <Button
-        color="primary"
-        onClick={() => setAddEmailOpen(true)}
-      >
-        <AddIcon/>
-      </Button>
-      <Modal
-        open={addEmailOpen}
-        onClose={() => setAddEmailOpen(false)}
-      >
-        {addEmailBody}
-      </Modal>
-      <Button
-        color="secondary"
-        disabled={currentEmail === -1}
-        onClick={handleDeleteEmail}
-      >
-        <RemoveIcon/>
-      </Button>
-    </Box>
+    <>
+      <Box className={classes.root} >
+      <Paper className={classes.root}>
+        <MenuList  component="nav">
+          {emailList.map((email, index) => (
+            <MenuItem
+                button
+                selected={index === currentEmail}
+                onClick={() => setCurrentEmail(index)}
+                key={index}
+            >
+              <ListItemIcon>
+                  <EmailIcon fontSize="small" />
+              </ListItemIcon>
+              <Typography variant="inherit" noWrap>
+                    {email.address}
+              </Typography>
+              <Button
+                onClick={() => setSettingOpen(true)}
+                style={{position: "absolute", bottom: 0, right: 0}}
+              >
+                    <SettingsIcon/>
+              </Button>
+          </MenuItem>
+          ))}
+        </MenuList>
+        <Modal
+                open={settingOpen}
+                onClose={() => setSettingOpen(false)}
+              >
+                {settingBody}
+        </Modal>
+      </Paper>
+      </Box>
+       <Box className={classes.addButton}>
+       <Button
+         color="primary"
+         onClick={() => setAddEmailOpen(true)}
+       >
+         <AddIcon/>
+       </Button>
+       <Modal
+         open={addEmailOpen}
+         onClose={() => setAddEmailOpen(false)}
+       >
+         {addEmailBody}
+       </Modal>
+       <Button
+         color="secondary"
+         disabled={currentEmail === -1}
+         onClick={handleDeleteEmail}
+       >
+         <RemoveIcon/>
+       </Button>
+     </Box>
+    </>
   );
 };
 

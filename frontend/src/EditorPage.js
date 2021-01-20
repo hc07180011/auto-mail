@@ -1,5 +1,5 @@
 import Box from "@material-ui/core/Box";
-import Container from "@material-ui/core/Container";
+import BraftEditor from "braft-editor";
 
 import { useEffect, useState } from "react";
 import {
@@ -33,32 +33,24 @@ const EditorPage = ({
   const [contentList, setContentList] = useState([]);
   const [currentContent, setCurrentContent] = useState(-1);
   const [subject, setSubject] = useState("");
-  const [text, setText] = useState("");
+  const [braftEditorState, setBraftEditorState] = useState(BraftEditor.createEditorState(null));
+
+  (async function() {
+    const { status, email } = await getEmailList({ token });
+    if (status === "ok") {
+      setEmailList(email);
+    } else if (status === "token invalid") {
+      setStatus({ type: "error", msg: "Token is invalid." });
+    } else {
+      // unexpected error
+      setStatus({ type: "error", msg: "Failed to initially load the Email list." });
+    }
+  })();
 
   useEffect(() => {
-    (async function() {
-      const { status, email } = await getEmailList({ token });
-      if (status === "ok") {
-        setEmailList(email);
-      } else if (status === "token invalid") {
-        setStatus({ type: "error", msg: "Token is invalid." })
-      } else {
-        // unexpected error
-      }
-    })();
-  }, [token]);
-
-  useEffect(() => {
-    if (currentEmail !== -1) {
-      (async function () {
-        const { status, content } = await getContentList({ token, emailId: emailList[currentEmail].id });
-        if (status === "ok") {
-          setContentList(content);
-          setCurrentContent(-1);
-        } else {
-          // unexpected error
-        }
-      })();
+    if (currentEmail === -1) {
+      setContentList([]);
+      setCurrentContent(-1);
     }
   }, [currentEmail]);
 
@@ -71,6 +63,7 @@ const EditorPage = ({
       setCreatePassword("");
     } else {
       // unexpected error
+      setStatus({ type: "error", msg: "Failed to add an email." });
     }
   };
 
@@ -84,9 +77,11 @@ const EditorPage = ({
       setUpdateAddress("");
       setUpdatePassword("");
     } else if (status === "token/emailId invalid") {
-      setStatus({ type: "success", msg: "Token/EmailId is invalid." });
+      // unexpected error
+      setStatus({ type: "error", msg: "Token/EmailId is invalid." });
     } else {
       // unexpected error
+      setStatus({ type: "error", msg: "Failed to update an Email." });
     }
   };
 
@@ -101,35 +96,60 @@ const EditorPage = ({
         setStatus({ type: "success", msg: "Email was deleted." });
       } else {
         // unexpected error
+        setStatus({ type: "error", msg: "Failed to delete an Email." });
       }
+    } else {
+      setStatus({ type: "warning", msg: "Please select an Email to delete." });
+    }
+  };
+
+  const handleGetContentList = async () => {
+    const { status, content } = await getContentList({ token, emailId: emailList[currentEmail].id });
+    if (status === "ok") {
+      setContentList(content);
+      setCurrentContent(-1);
+    } else {
+      // unexpected error
+      setStatus({ type: "error", msg: "Failed to load the content list." });
     }
   };
 
   const handleAddContent = async () => {
-    const { status, id } = await addContent({ token, emailId: emailList[currentEmail].id, subject, text });
+    const { status, id } = await addContent({
+      token,
+      emailId: emailList[currentEmail].id,
+      subject,
+      text: braftEditorState.toHTML(),
+    });
     if (status === "ok") {
+      const newCurrentContent = contentList.length;
       setContentList([...contentList, { id, subject }]);
-      setCurrentContent(contentList.length - 1);
+      setCurrentContent(newCurrentContent);
       setStatus({ type: "success", msg: "Content was added." });
     } else {
       // unexpected error
+      setStatus({ type: "error", msg: "Failed to add a content." });
     }
   };
 
   const handleGetContent = async () => {
-    const { status, subject, text } = await getContent({ token, emailId: emailList[currentEmail].id, contentId: contentList[currentContent].id });
+    const { status, subject, text } = await getContent({
+      token,
+      emailId: emailList[currentEmail].id,
+      contentId: contentList[currentContent].id
+    });
     if (status === "ok") {
       setSubject(subject);
-      setText(text);
-    } 
+      setBraftEditorState(BraftEditor.createEditorState(text));
+    } else {
+      setStatus({ type: "error", msg: "Failed to load a content." });
+    }
   };
 
   useEffect(() => {
-    if (currentContent !== -1) {
-      handleGetContent();
-    } else {
+    if (currentContent === -1) {
       setSubject("");
-      setText("");
+      setBraftEditorState(BraftEditor.createEditorState(null));
     }
   }, [currentContent]);
 
@@ -139,12 +159,16 @@ const EditorPage = ({
       emailId: emailList[currentEmail].id,
       contentId: contentList[currentContent].id,
       subject,
-      text,
+      text: braftEditorState.toHTML(),
     });
     if (status === "ok") {
-      setStatus({type: "success", msg: "Content was updated."})
+      let newContentList = contentList;
+      newContentList[currentContent].subject = subject;
+      setContentList(newContentList);
+      setStatus({ type: "success", msg: "Content was updated." })
     } else {
       // unexpected error
+      setStatus({ type: "error", msg: "Failed to update a content." });
     }
   };
 
@@ -159,7 +183,10 @@ const EditorPage = ({
         setStatus({ type: "success", msg: "Content was deleted." })
       } else {
         // unexpected error
+        setStatus({ type: "error", msg: "Failed to delete a content." });
       }
+    } else {
+      setStatus({ type: "warning", msg: "Please select a content to delete." })
     }
   }
 
@@ -172,32 +199,34 @@ const EditorPage = ({
       <EmailList
         emailList={emailList}
         currentEmail={currentEmail}
-        setCurrentEmail={(currentEmail) => setCurrentEmail(currentEmail)}
+        setCurrentEmail={setCurrentEmail}
         createAddress={createAddress}
-        setCreateAddress={(createAddress) => setCreateAddress(createAddress)}
+        setCreateAddress={setCreateAddress}
         createPassword={createPassword}
-        setCreatePassword={(createPassword) => setCreatePassword(createPassword)}
+        setCreatePassword={setCreatePassword}
         updateAddress={updateAddress}
-        setUpdateAddress={(updateAddress) => setUpdateAddress(updateAddress)}
+        setUpdateAddress={setUpdateAddress}
         updatePassword={updatePassword}
-        setUpdatePassword={(updatePassword) => setCreatePassword(updatePassword)}
+        setUpdatePassword={setCreatePassword}
         handleAddEmail={handleAddEmail}
         handleUpdateEmail={handleUpdateEmail}
         handleDeleteEmail={handleDeleteEmail}
+        handleGetContentList={handleGetContentList}
       />
       <ContentList
-        contentList={ContentList}
+        contentList={contentList}
         currentContent={currentContent}
-        setCurrentContent={(currentContent) => setCurrentContent(currentContent)}
+        setCurrentContent={setCurrentContent}
         handleGetContent={handleGetContent}
         handleDeleteContent={handleDeleteContent}
       />
       <Editor
+        disabled={currentEmail === -1}
         currentContent={currentContent}
         subject={subject}
-        setSubject={(subject) => setSubject(subject)}
-        text={text}
-        setText={(text) => setText(text)}
+        setSubject={setSubject}
+        braftEditorState={braftEditorState}
+        setBraftEditorState={setBraftEditorState}
         handleAddContent={handleAddContent}
         handleUpdateContent={handleUpdateContent}
         handleDeliver={handleDeliver}

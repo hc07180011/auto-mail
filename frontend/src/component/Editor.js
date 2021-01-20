@@ -13,6 +13,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Editor = ({
+  disabled,
+  currentEmail,
   currentContent,
   subject,
   setSubject,
@@ -26,10 +28,10 @@ const Editor = ({
   const [braftEditorState, setBraftEditorState] = useState(BraftEditor.createEditorState(text));
 
   useEffect(() => {
+    setBraftEditorState(BraftEditor.createEditorState(text));
+  }, [text]);
 
-  }, []);
-
-  return (
+  return disabled ? (<></>) : (
     <>
       <TextField
         variant="outlined"
@@ -51,8 +53,18 @@ const Editor = ({
         <Button>
           Attachments
         </Button>
-        <Button>
-          Send
+        <Button
+          onClick={currentContent === -1 ? (() => {
+            const text = braftEditorState.toHTML();
+            setText(text);
+            handleAddContent(text);
+          }) : (() => {
+            const text = braftEditorState.toHTML();
+            setText(text);
+            handleUpdateContent(text);
+          })}
+        >
+          {currentContent === -1 ? "Save" : "Update"}
         </Button>
       </Grid>
     </>
