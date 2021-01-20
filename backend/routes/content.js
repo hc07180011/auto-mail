@@ -177,49 +177,58 @@ router.post('/detail/update', (req, res) => {
     const text = req.body.text
     console.log('/content/detail/update', token, emailId, contentId, subject, text)
 
-    User.find({
+    User.findOne({
       $and: [
         { token: token },
-        { "mailList._id": emailId },
-        { "mailList.content._id": contentId },
       ]
-    },
-    { "mailList.content.$": 1 }
-    )
-    .exec((error, response) => {
-      if (error) {
-        console.log('internal error')
-        res.status(500).send({
-          status: 'internal error',
-        })
-      }
-      else if (!response.length || !response[0].mailList.length || !response[0].mailList[0].content.length) {
+    })
+    .then((doc) => {
+      console.log(doc)
+      if (!doc.mailList || !doc.mailList.length || !doc.mailList[0].content.length) {
         console.log('token/emailId/contentId invalid')
         res.status(200).send({
           status: 'token/emailId/contentId invalid',
         })
-      }
-      else {
-        for (var i = 0; i < response[0].mailList[0].content.length; i++) {
-          console.log(response[0].mailList[0].content[i])
-          if (String(response[0].mailList[0].content[i]._id) === contentId) {
-            response[0].mailList[0].content[i] = {
-              _id: mongoose.Types.ObjectId(contentId),
-              subject: subject,
-              text: text,
-              attachments: []
+      } else {
+        for (var i = 0; i < doc.mailList.length; i++) {
+          for (var j = 0; j < doc.mailList[i].content.length; j++) {
+            // console.log('====================')
+            // console.log(i, j)
+            // console.log(doc.mailList[i])
+            // console.log(doc.mailList[i].content[j])
+            if (String(doc.mailList[i]._id) == emailId && String(doc.mailList[i].content[j]._id) === contentId) {
+              doc.mailList[i].content[j] = {
+                _id: mongoose.Types.ObjectId(contentId),
+                subject: subject,
+                text: text,
+                attachments: []
+              }
+              console.log('after mod', doc)
+              doc.markModified("mailList." + i + ".content." + j)
+              doc.save()
+              .then((xxx) => {
+                console.log('ok')
+                res.status(200).send({
+                  status: 'ok',
+                })
+              })
+              .catch((yyy) => {
+                console.log('mongo error')
+                res.status(500).send({
+                  status: 'internal error',
+                })
+              })
+              return
             }
-            console.log('after mod', response[0].mailList[0].content[i])
-            response[0].markModified("mailList.0.content")
-            console.log('ok')
-            res.status(200).send({
-              status: 'ok',
-            })
-            response[0].save()
-            return
           }
-        }        
+        }
       }
+    })
+    .catch((err) => {
+      console.log('internal error')
+      res.status(500).send({
+        status: 'internal error',
+      })
     })
   } catch(error) {
     console.log(error)
