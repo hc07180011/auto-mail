@@ -59,7 +59,9 @@ const deleteContent = async (req) => {
 }
 
 const deliver = async (req) => {
-  const { data } = await instance.post("/deliver/create", req);
+  const { data } = await instance.post("/deliver/create", req, {
+    'content-type': 'multipart/form-data'
+  });
   return data;
 }
 
