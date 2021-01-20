@@ -17,10 +17,10 @@ import ContentDetailUpdate from './api_example/content/detail_update';
 
 import DeliverCreate from './api_example/deliver/create';
 
-const baseUri = 'api.automail.henrychao.me'
-const API_ROOT = 'http://api.automail.henrychao.me'
-// const baseUri = 'localhost:4000'
-// const API_ROOT = 'http://localhost:4000'
+// const baseUri = 'https://api-pigeons.herokuapp.com/'
+// const API_ROOT = 'https://api-pigeons.herokuapp.com/'
+const baseUri = 'localhost:4000'
+const API_ROOT = 'http://localhost:4000'
 const instance = axios.create({
   baseURL: API_ROOT
 })

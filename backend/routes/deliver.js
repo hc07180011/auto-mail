@@ -25,13 +25,23 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
   try {
     const token = req.body.token
     const emailId = req.body.emailId
-    const contentId = req.body.contentId
+    const subject = req.body.subject
+    const text = req.body.text
     const authToken = req.body.authToken
     const attachments = req.files
-    const recipients = req.body.recipients.split(",")
-    const cc = req.body.cc
-    const bcc = req.body.bcc
-    console.log('/deliver/create', token, emailId, contentId, recipients, cc, bcc, attachments)
+    const recipients = req.body.recipients.split(",").filter(elem => elem.length)
+    const cc = req.body.cc.split(",").filter(elem => elem.length)
+    const bcc = req.body.bcc.split(",").filter(elem => elem.length)
+    const tmpExcelData = JSON.parse(req.body.excelData)
+    var excelData = {}
+    for (var i = 0; i < tmpExcelData[0].length; i++) {
+      tmpExcelData[0][i] = "$[[" + tmpExcelData[0][i] + "]]"
+      excelData[tmpExcelData[0][i]] = []
+      for (var j = 1; j < tmpExcelData.length; j++) {
+        excelData[tmpExcelData[0][i]].push(tmpExcelData[j][i])
+      }
+    }
+    console.log('/deliver/create', token, emailId, subject, text, authToken, recipients, cc, bcc, excelData, attachments)
 
     User.find({
       $and: [
@@ -55,115 +65,130 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
         })
       }
       else {
-        response[0].mailList[0].content.forEach((content) => {
-          if (String(content._id) === String(contentId)) {
-            if (response[0].mailList[0].address.includes('gmail.com')) {
-              const oAuth2Client = new OAuth2(
-                '421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com',
-                'ZoVhm_48CzhGJfDN2zqjDRj7',
-                'http://ntuai.csie.org'
-              )
+        if (response[0].mailList[0].address.includes('gmail.com')) {
+          const oAuth2Client = new OAuth2(
+            '421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com',
+            'ZoVhm_48CzhGJfDN2zqjDRj7',
+            'https://api-pigeons.herokuapp.com/'
+          )
 
-              oAuth2Client
-              .getToken(authToken)
-              .then((tokenResult) => {
-                const refreshToken = tokenResult.tokens.refresh_token
-                const accessToken = tokenResult.tokens.access_token
-                console.log('success', refreshToken, accessToken)
+          oAuth2Client
+          .getToken(authToken)
+          .then((tokenResult) => {
+            const refreshToken = tokenResult.tokens.refresh_token
+            const accessToken = tokenResult.tokens.access_token
+            console.log('success', refreshToken, accessToken)
 
-                recipients.forEach((recipient) => {
-                  var transporter = nodemailer.createTransport({
-                    host: 'smtp.gmail.com',
-                    port: 465,
-                    secure: true,
-                    auth: {
-                        type: 'OAuth2',
-                        user: response[0].mailList[0].address,
-                        clientId: '421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com',
-                        clientSecret: 'ZoVhm_48CzhGJfDN2zqjDRj7',
-                        refreshToken: refreshToken,
-                        accessToken: accessToken,
-                    },
-                  })
-                  
-                  var mailOptions = {
-                    from: response[0].mailList[0].address,
-                    to: recipient,
-                    cc: cc,
-                    bcc: bcc,
-                    subject: content.subject,
-                    generateTextFromHTML: true,
-                    html: content.text,
-                    attachments: attachments.map((attachment) => (
-                      {
-                        filename: attachment.originalname,
-                        content: Buffer.from(attachment.buffer),
-                        contentType: attachment.mimetype,
-                      }
-                    )),
-                  }
-                  
-                  transporter.sendMail(mailOptions, function(error, info) {
-                    if (error) {
-                      console.log(error)
-                    } else {
-                      console.log('Email sent: ' + info.response)
-                    }
-                  })
-                  
-                })
-                console.log('ok')
-                res.status(200).send({
-                  status: 'ok',
-                })
-              })
-              .catch((err) => {
-                console.log('failed', err)
-              })
-            }
-            else {
-              recipients.forEach((recipient) => {
-                var transporter = nodemailer.createTransport({
-                  host: 'smtps.ntu.edu.tw',
-                  port: 465,
-                  secure: true,
-                  auth: {
+            for (var i = 0; i < tmpExcelData.length-1; i++) {
+
+              var transporter = nodemailer.createTransport({
+                host: 'smtp.gmail.com',
+                port: 465,
+                secure: true,
+                auth: {
+                    type: 'OAuth2',
                     user: response[0].mailList[0].address,
-                    pass: response[0].mailList[0].password,
-                  }
-                })
-                
-                var mailOptions = {
-                  from: response[0].mailList[0].address,
-                  to: recipient,
-                  cc: cc,
-                  bcc: bcc,
-                  subject: content.subject,
-                  html: content.text,
-                  attachments: attachments.map((attachment) => (
-                    {
-                      filename: attachment.originalname,
-                      content: Buffer.from(attachment.buffer),
-                      contentType: attachment.mimetype,
-                    }
-                  ))
-                }
-                
-                transporter.sendMail(mailOptions, function(error, info) {
-                  if (error) {
-                    console.log(error)
-                  } else {
-                    console.log('Email sent: ' + info.response)
-                  }
-                })
-                console.log('ok')
-                res.status(200).send({
-                  status: 'ok',
-                })
+                    clientId: '421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com',
+                    clientSecret: 'ZoVhm_48CzhGJfDN2zqjDRj7',
+                    refreshToken: refreshToken,
+                    accessToken: accessToken,
+                },
               })
+              
+              var to_ = []
+              for (var j = 0; j < recipients.length; j++) {
+                to_.push(excelData[recipients[j]][i])
+              }
+              var cc_ = []
+              for (var j = 0; j < cc.length; j++) {
+                cc_.push(excelData[cc[j]][i])
+              }
+              var bcc_ = []
+              for (var j = 0; j < bcc.length; j++) {
+                bcc_.push(excelData[bcc[j]][i])
+              }
+
+              var html = text
+              for (var j = 0; j < tmpExcelData[0].length; j++) {
+                html = html.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
+              }
+
+              var mailOptions = {
+                from: response[0].mailList[0].address,
+                to: to_,
+                cc: cc_,
+                bcc: bcc_,
+                subject: subject,
+                generateTextFromHTML: true,
+                html: html,
+                attachments: attachments.map((attachment) => (
+                  {
+                    filename: attachment.originalname,
+                    content: Buffer.from(attachment.buffer),
+                    contentType: attachment.mimetype,
+                  }
+                )),
+              }
+              
+              transporter.sendMail(mailOptions, function(error, info) {
+                if (error) {
+                  console.log(error)
+                } else {
+                  console.log('Email sent: ' + info.response)
+                }
+              })
+              
             }
-          }
-        })
+            console.log('ok')
+            res.status(200).send({
+              status: 'ok',
+            })
+          })
+          .catch((err) => {
+            console.log('failed', err)
+          })
+        }
+        else {
+          recipients.forEach((recipient) => {
+            var transporter = nodemailer.createTransport({
+              host: 'smtps.ntu.edu.tw',
+              port: 465,
+              secure: true,
+              auth: {
+                user: response[0].mailList[0].address,
+                pass: response[0].mailList[0].password,
+              }
+            })
+            
+            var mailOptions = {
+              from: response[0].mailList[0].address,
+              to: recipient,
+              cc: cc,
+              bcc: bcc,
+              subject: content.subject,
+              html: content.text,
+              attachments: attachments.map((attachment) => (
+                {
+                  filename: attachment.originalname,
+                  content: Buffer.from(attachment.buffer),
+                  contentType: attachment.mimetype,
+                }
+              ))
+            }
+            
+            transporter.sendMail(mailOptions, function(error, info) {
+              if (error) {
+                console.log(error)
+              } else {
+                console.log('Email sent: ' + info.response)
+              }
+            })
+            console.log('ok')
+            res.status(200).send({
+              status: 'ok',
+            })
+          })
+        }
       }
     })
   } catch(error) {
