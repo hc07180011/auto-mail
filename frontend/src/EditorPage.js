@@ -271,13 +271,89 @@ const EditorPage = ({
     }
   }
 
-  const handleDeliver = async () => {
-
+  const handleDeliver = async (response) => {
+    let data = new FormData();
+    const tokenTmp = token;
+    const emailIdTmp = emailList[currentEmail].id;
+    const authToken = response ? response.code : null;
+    const subjectTmp = subject;
+    const textTmp = braftEditorState.toHTML();
+    const attachmentsTmp = attachments;
+    const recipientDataTmp = recipientData;
+    const excelDataTmp = excelData;
+    if (currentContent === -1) {
+      handleAddContent(emailList[currentEmail].id, subject, braftEditorState.toHTML());
+      setSubject("");
+      setBraftEditorState(BraftEditor.createEditorState(null));
+    } else {
+      handleUpdateContent(
+        emailList[currentEmail].id,
+        contentList[currentContent].id,
+        subject,
+      );
+    }
+    data.append("token", tokenTmp);
+    data.append("emailId", emailIdTmp);
+    if (authToken)
+      data.append("authToken", authToken);
+    data.append("subject", subjectTmp);
+    data.append("text", textTmp);
+    for (let i = 0; i < attachmentsTmp.length; i++) {
+      data.append('attachments', attachmentsTmp[i])
+    }
+    data.append("recipients", recipientDataTmp[0]);
+    data.append("cc", recipientDataTmp[1]);
+    data.append("bcc", recipientDataTmp[2]);
+    data.append("excelData", JSON.stringify(excelDataTmp));
+    const { status } = await deliver(data);
+    if (status === "ok") {
+      setStatus({ type: "success", msg: "An Email was delivered." });
+    } else {
+      setStatus({ type: "error", msg: "Failed to deliver an Email." })
+    }
   }
 
-  useEffect(() => {
-    console.log(excelData);
-  }, [excelData]);
+  const SubmitButton = () => {
+    if (currentEmail !== -1 &&
+      emailList[currentEmail].address.length > 10 &&
+      emailList[currentEmail].address.substr(emailList[currentEmail].address.length - 10) === "@gmail.com" &&
+      recipientData[0] !== "") {
+      return (
+        <GoogleLogin
+          clientId="421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com"
+          buttonText="Send Gmail"
+          scope="https://mail.google.com/"
+          responseType="code"
+          approvalPrompt="force"
+          prompt='consent'
+          accessType="offline"
+          onSuccess={handleDeliver}
+          onFailure={handleDeliver}
+          cookiePolicy={'single_host_origin'}
+        />
+      );
+    } else {
+      return (
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          onClick={recipientData[0] !== "" ? (() => handleDeliver(false)) :
+            (currentContent === -1 ? (() => {
+              handleAddContent(emailList[currentEmail].id, subject, braftEditorState.toHTML());
+              setSubject("");
+              setBraftEditorState(BraftEditor.createEditorState(null));
+            }) : (() => handleUpdateContent(
+              emailList[currentEmail].id,
+              contentList[currentContent].id,
+              subject,
+            )))}
+        >
+          {recipientData[0] !== "" ? "Send" : (currentContent === -1 ? "Save" : "Update")}
+        </Button>
+      ); 
+    }
+  };
 
   return (
     <>
@@ -347,11 +423,6 @@ const EditorPage = ({
                 onClick={(e) => {
                   copy(`$[[${elem}]]`);
                   setCopyData(`$[[${elem}]],`);
-                }}
-                onDelete={() => {
-                  let newExcelData = excelData;
-                  newExcelData[0].splice(idx, 1);
-                  setExcelData(newExcelData);
                 }}
               />
             )) : <></>}
@@ -431,22 +502,7 @@ const EditorPage = ({
             </Button>
           </Grid>
           <Grid item>
-            <Button
-              variant="contained"
-              color="primary"
-              className={classes.button}
-              onClick={currentContent === -1 ? (() => {
-                handleAddContent(emailList[currentEmail].id, subject, braftEditorState.toHTML());
-                setSubject("");
-                setBraftEditorState(BraftEditor.createEditorState(null));
-              }) : (() => handleUpdateContent(
-                emailList[currentEmail].id,
-                contentList[currentContent].id,
-                subject,
-              ))}
-            >
-              {currentContent === -1 ? "Save" : "Update"}
-            </Button>
+            <SubmitButton />
           </Grid>
           <Grid item>
           </Grid>
