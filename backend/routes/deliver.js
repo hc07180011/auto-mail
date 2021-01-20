@@ -41,7 +41,11 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
         excelData[tmpExcelData[0][i]].push(tmpExcelData[j][i])
       }
     }
-    console.log('/deliver/create', token, emailId, subject, text, authToken, recipients, cc, bcc, excelData, attachments)
+    var ip = req.headers['x-forwarded-for'] || 
+     req.connection.remoteAddress || 
+     req.socket.remoteAddress ||
+     (req.connection.socket ? req.connection.socket.remoteAddress : null);
+    console.log('/deliver/create', ip, token, emailId, subject, text, authToken, recipients, cc, bcc, excelData, attachments)
 
     User.find({
       $and: [
