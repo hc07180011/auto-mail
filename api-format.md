@@ -295,18 +295,15 @@
 {
     "token": string!,
     "emailId": string!,
-    "contentId": string!,
+    "subject": string!,
+    "text": string!,
     "authToken": string!,
-    "recipients": [
-        string!,
-        ...
-    ],
-    "cc": [
-        string!,
-        ...
-    ],
-    "bcc": [
-        string!,
+    "recipients": string!,
+    "cc": string!,
+    "bcc": string!,
+    "excelData": [
+        [field_title1, field_title2, ...],
+        [field_data1, field_data2, ...],
         ...
     ]
 }

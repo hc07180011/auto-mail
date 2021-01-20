@@ -110,6 +110,12 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
               }
 
               var subject_ = subject
+
+              for (var j = 0; j < tmpExcelData[0].length; j++) {
+                subject_ = subject_.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
+              }
+
+              var html = text
               for (var j = 0; j < tmpExcelData[0].length; j++) {
                 subject_ = subject_.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
               }
