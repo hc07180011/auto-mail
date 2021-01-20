@@ -1,5 +1,9 @@
+import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+import { makeStyles } from '@material-ui/core/styles';
 import BraftEditor from "braft-editor";
+
 
 import { useEffect, useState } from "react";
 import {
@@ -19,12 +23,24 @@ import EmailList from "./component/EmailList";
 import ContentList from "./component/ContentList";
 import Editor from "./component/Editor";
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    margin: theme.spacing(1),
+  },
+  button: {
+    margin: theme.spacing(1),
+  },
+}));
+
 const EditorPage = ({
   username,
   token,
   setStatus,
 }) => {
+  const classes = useStyles();
+
   const [emailList, setEmailList] = useState([]);
+  const [emailListLoading, setEmailListLoading] = useState(false);
   const [currentEmail, setCurrentEmail] = useState(-1);
   const [createAddress, setCreateAddress] = useState("");
   const [createPassword, setCreatePassword] = useState("");
@@ -35,17 +51,21 @@ const EditorPage = ({
   const [subject, setSubject] = useState("");
   const [braftEditorState, setBraftEditorState] = useState(BraftEditor.createEditorState(null));
 
-  (async function() {
-    const { status, email } = await getEmailList({ token });
-    if (status === "ok") {
-      setEmailList(email);
-    } else if (status === "token invalid") {
-      setStatus({ type: "error", msg: "Token is invalid." });
-    } else {
-      // unexpected error
-      setStatus({ type: "error", msg: "Failed to initially load the Email list." });
-    }
-  })();
+  useEffect(() => {
+    (async function () {
+      // setEmailListLoading(true);
+      const { status, email } = await getEmailList({ token });
+      if (status === "ok") {
+        setEmailList(email);
+        // setEmailListLoading(false);
+      } else if (status === "token invalid") {
+        setStatus({ type: "error", msg: "Token is invalid." });
+      } else {
+        // unexpected error
+        setStatus({ type: "error", msg: "Failed to load the Email list." });
+      }
+    })();
+  }, [token]);
 
   useEffect(() => {
     if (currentEmail === -1) {
@@ -54,28 +74,29 @@ const EditorPage = ({
     }
   }, [currentEmail]);
 
-  const handleAddEmail = async () => {
-    const { status, id } = await addEmail({ token, address: createAddress, password: createPassword });
+  const handleAddEmail = async (address, password) => {
+    const { status, id } = await addEmail({ token, address, password});
     if (status === "ok") {
-      setEmailList([...emailList, { id, address: createAddress, status: true }]);
+      setEmailList([...emailList, { id, address, status: true }]);
       setStatus({ type: "success", msg: "Email was added." });
-      setCreateAddress("");
-      setCreatePassword("");
     } else {
       // unexpected error
       setStatus({ type: "error", msg: "Failed to add an email." });
     }
   };
 
-  const handleUpdateEmail = async (index) => {
-    const { status } = await updateEmail({ token, emailId: emailList[index].id, updateAddress, updatePassword });
+  const handleUpdateEmail = async (emailId, address, password) => {
+    const { status } = await updateEmail({ token, emailId, address, password });
     if (status === "ok") {
       let newEmailList = emailList;
-      newEmailList[index].address = updateAddress;
+      for (let i = 0; i < newEmailList.length; i++) {
+        if (newEmailList[i].id === emailId) {
+          newEmailList[i].address = address;
+          break;
+        }
+      }
       setEmailList(newEmailList);
       setStatus({ type: "success", msg: "Email information was updated." });
-      setUpdateAddress("");
-      setUpdatePassword("");
     } else if (status === "token/emailId invalid") {
       // unexpected error
       setStatus({ type: "error", msg: "Token/EmailId is invalid." });
@@ -87,12 +108,18 @@ const EditorPage = ({
 
   const handleDeleteEmail = async () => {
     if (currentEmail !== -1) {
-      const { status } = await deleteEmail({ token, emailId: emailList[currentEmail].id });
+      const emailId = emailList[currentEmail].id;
+      setCurrentEmail(-1);
+      const { status } = await deleteEmail({ token, emailId });
       if (status === "ok") {
         let newEmailList = emailList;
-        newEmailList.splice(currentEmail, 1);
+        for (let i = 0; i < newEmailList.length; i++) {
+          if (newEmailList[i].id === emailId) {
+            newEmailList.splice(i, 1);
+            break;
+          }
+        }
         setEmailList(newEmailList);
-        setCurrentEmail(-1);
         setStatus({ type: "success", msg: "Email was deleted." });
       } else {
         // unexpected error
@@ -103,11 +130,12 @@ const EditorPage = ({
     }
   };
 
-  const handleGetContentList = async () => {
-    const { status, content } = await getContentList({ token, emailId: emailList[currentEmail].id });
+  const handleGetContentList = async (emailId) => {
+    setCurrentContent(-1);
+    const { status, content } = await getContentList({ token, emailId });
     if (status === "ok") {
-      setContentList(content);
-      setCurrentContent(-1);
+      if (currentEmail !== -1 && emailList[currentEmail].id === emailId)
+        setContentList(content);
     } else {
       // unexpected error
       setStatus({ type: "error", msg: "Failed to load the content list." });
@@ -115,6 +143,7 @@ const EditorPage = ({
   };
 
   const handleAddContent = async () => {
+    const subjectTmp = subject;
     const { status, id } = await addContent({
       token,
       emailId: emailList[currentEmail].id,
@@ -122,9 +151,7 @@ const EditorPage = ({
       text: braftEditorState.toHTML(),
     });
     if (status === "ok") {
-      const newCurrentContent = contentList.length;
-      setContentList([...contentList, { id, subject }]);
-      setCurrentContent(newCurrentContent);
+      setContentList([...contentList, { id, subjectTmp }]);
       setStatus({ type: "success", msg: "Content was added." });
     } else {
       // unexpected error
@@ -195,43 +222,87 @@ const EditorPage = ({
   }
 
   return (
-    <Box>
-      <EmailList
-        emailList={emailList}
-        currentEmail={currentEmail}
-        setCurrentEmail={setCurrentEmail}
-        createAddress={createAddress}
-        setCreateAddress={setCreateAddress}
-        createPassword={createPassword}
-        setCreatePassword={setCreatePassword}
-        updateAddress={updateAddress}
-        setUpdateAddress={setUpdateAddress}
-        updatePassword={updatePassword}
-        setUpdatePassword={setCreatePassword}
-        handleAddEmail={handleAddEmail}
-        handleUpdateEmail={handleUpdateEmail}
-        handleDeleteEmail={handleDeleteEmail}
-        handleGetContentList={handleGetContentList}
-      />
-      <ContentList
-        contentList={contentList}
-        currentContent={currentContent}
-        setCurrentContent={setCurrentContent}
-        handleGetContent={handleGetContent}
-        handleDeleteContent={handleDeleteContent}
-      />
-      <Editor
-        disabled={currentEmail === -1}
-        currentContent={currentContent}
-        subject={subject}
-        setSubject={setSubject}
-        braftEditorState={braftEditorState}
-        setBraftEditorState={setBraftEditorState}
-        handleAddContent={handleAddContent}
-        handleUpdateContent={handleUpdateContent}
-        handleDeliver={handleDeliver}
-      />
-    </Box>
+    <>
+      <Grid container spacing={2} justify="center" className={classes.root}>
+        <Grid item xs={3}>
+          <EmailList
+            emailListLoading={emailListLoading}
+            emailList={emailList}
+            currentEmail={currentEmail}
+            setCurrentEmail={setCurrentEmail}
+            createAddress={createAddress}
+            setCreateAddress={setCreateAddress}
+            createPassword={createPassword}
+            setCreatePassword={setCreatePassword}
+            updateAddress={updateAddress}
+            setUpdateAddress={setUpdateAddress}
+            updatePassword={updatePassword}
+            setUpdatePassword={setUpdatePassword}
+            handleAddEmail={handleAddEmail}
+            handleUpdateEmail={handleUpdateEmail}
+            handleDeleteEmail={handleDeleteEmail}
+            handleGetContentList={handleGetContentList}
+          />
+        </Grid>
+        <Grid item xs={8}>
+          <ContentList
+            contentList={contentList}
+            currentContent={currentContent}
+            setCurrentContent={setCurrentContent}
+            handleGetContent={handleGetContent}
+            handleDeleteContent={handleDeleteContent}
+          />
+          <Editor
+            disabled={currentEmail === -1}
+            currentContent={currentContent}
+            subject={subject}
+            setSubject={setSubject}
+            braftEditorState={braftEditorState}
+            setBraftEditorState={setBraftEditorState}
+            handleAddContent={handleAddContent}
+            handleUpdateContent={handleUpdateContent}
+            handleDeliver={handleDeliver}
+          />
+        </Grid>
+      </Grid>
+      <Box mt={8} style={{ backgroundColor: "rgb(216, 234, 245)", position: "fixed", bottom: "0%", width: "100%", zIndex: 950 }}>
+        <Grid container justify="flex-end" spacing={2}>
+          <Grid item>
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.button}
+            >
+              Recipients
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.button}
+            >
+              Attachments
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.button}
+            >
+              {currentContent === -1 ? "Save" : "Update"}
+            </Button>
+          </Grid>
+          <Grid item>
+          </Grid>
+          <Grid item>
+          </Grid>
+          <Grid item>
+          </Grid>
+        </Grid>
+      </Box>
+    </>
   );
 };
 

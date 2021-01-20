@@ -7,9 +7,13 @@ import "braft-editor/dist/index.css";
 import { useEffect, useState } from "react";
 
 const useStyles = makeStyles((theme) => ({
-  footer: {
-    flexGrow: 1,
-  }
+  editor: {
+    maxHeight: "70%",
+    backgroundColor: theme.palette.background.paper,
+    border: '1px solid #000',
+    borderRadius: "1%",
+    margin: theme.spacing(0, 0, 1),
+  },
 }));
 
 const Editor = ({
@@ -41,32 +45,48 @@ const Editor = ({
         value={subject}
         onChange={(e) => setSubject(e.target.value)}
       />
-      <BraftEditor
-        language="en"
-        value={braftEditorState}
-        onChange={(state) => setBraftEditorState(state)}
-      />
-      <Grid container className={classes.footer} justify="flex-end" spacing={2}>
-        <Button>
-          Recipients
-        </Button>
-        <Button>
-          Attachments
-        </Button>
-        <Button
-          onClick={currentContent === -1 ? (() => {
-            const text = braftEditorState.toHTML();
-            setText(text);
-            handleAddContent(text);
-          }) : (() => {
-            const text = braftEditorState.toHTML();
-            setText(text);
-            handleUpdateContent(text);
-          })}
-        >
-          {currentContent === -1 ? "Save" : "Update"}
-        </Button>
-      </Grid>
+      <div className={classes.editor}>
+        <BraftEditor
+          language="en"
+          value={braftEditorState}
+          onChange={(state) => setBraftEditorState(state)}
+        />
+      </div>
+      {/* <Grid container justify="flex-end" spacing={2}>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+          >
+            Recipients
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+          >
+            Attachments
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={currentContent === -1 ? (() => {
+              const text = braftEditorState.toHTML();
+              setText(text);
+              handleAddContent(text);
+            }) : (() => {
+              const text = braftEditorState.toHTML();
+              setText(text);
+              handleUpdateContent(text);
+            })}
+          >
+            {currentContent === -1 ? "Save" : "Update"}
+          </Button>
+        </Grid>
+      </Grid> */}
     </>
   );
 };

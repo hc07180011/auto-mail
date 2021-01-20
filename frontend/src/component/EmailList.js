@@ -14,6 +14,7 @@ import RemoveIcon from "@material-ui/icons/Remove";
 import Modal from "@material-ui/core/Modal";
 import TextField from "@material-ui/core/TextField";
 import SettingsIcon from '@material-ui/icons/Settings';
+import Grid from "@material-ui/core/Grid";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -42,10 +43,12 @@ TabPanel.propTypes = {
 };
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    width: 230,
-  },
   paper: {
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+  },
+  input: {
     position: 'absolute',
     width: 400,
     backgroundColor: theme.palette.background.paper,
@@ -54,16 +57,12 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2, 3, 4),
   },
   button:{
-    margin: theme.spacing(1, 0, 1),
+    margin: theme.spacing(1),
   },
-  addButton:{
-    position: 'absolute',
-    left: 0,
-    bottom: 0,
-  }
 }));
 
 const EmailList = ({
+  emailListLoading,
   emailList,
   currentEmail,
   setCurrentEmail,
@@ -88,10 +87,10 @@ const EmailList = ({
     };
   });
   const [addEmailOpen, setAddEmailOpen] = useState(false);
-  const [settingOpen, setSettingOpen] = useState(false);
+  const [updateEmailOpen, setUpdateEmailOpen] = useState(false);
 
   const addEmailBody = (
-    <div style={modalStyle} className={classes.paper}>
+    <div style={modalStyle} className={classes.input}>
       <TextField
         variant="outlined"
         margin="normal"
@@ -116,8 +115,10 @@ const EmailList = ({
         variant="contained"
         color="primary"
         onClick={() => {
-          handleAddEmail();
+          handleAddEmail(createAddress, createPassword);
           setAddEmailOpen(false);
+          setCreateAddress("");
+          setCreatePassword("");
         }}
         className={classes.button}
       >
@@ -136,24 +137,26 @@ const EmailList = ({
       >
         Close
       </Button>
-      <Button
+      {/*<Button
         fullWidth
         variant="contained"
         className={classes.button}
       >
         For Google Login
-      </Button>
+      </Button>*/}
     </div>
   );
 
-  const settingBody = (
-    <div style={modalStyle} className={classes.paper}>
+  const updateEmailBody = (
+    <div style={modalStyle} className={classes.input}>
       <TextField
         variant="outlined"
         margin="normal"
         required
         fullWidth
         label="Email Address"
+        value={updateAddress}
+        onChange={(e) => setUpdateAddress(e.target.value)}
       />
       <TextField
         variant="outlined"
@@ -162,12 +165,20 @@ const EmailList = ({
         fullWidth
         label="Password"
         type="password"
+        value={updatePassword}
+        onChange={(e) => setUpdatePassword(e.target.value)}
       />
       <Button
         fullWidth
         variant="contained"
         color="secondary"
         className={classes.button}
+        onClick={() => {
+          handleUpdateEmail(emailList[currentEmail].id, updateAddress, updatePassword);
+          setUpdateEmailOpen(false);
+          setUpdateAddress("");
+          setUpdatePassword("");
+        }}
       >
         Update
       </Button>
@@ -175,7 +186,11 @@ const EmailList = ({
         fullWidth
         variant="contained"
         color="secondary"
-        onClick={() => setSettingOpen(false)}
+        onClick={() => {
+          setUpdateEmailOpen(false);
+          setUpdateAddress("");
+          setUpdatePassword("");
+        }}
         className={classes.button}
       >
         Close
@@ -183,17 +198,19 @@ const EmailList = ({
     </div>
   );
 
-  return (
+  return emailListLoading ? (<>Loading...</>) : (
     <>
-      <Box className={classes.root} >
-      <Paper className={classes.root}>
+      <Paper className={classes.paper}>
         <MenuList  component="nav">
           {emailList.map((email, index) => (
             <MenuItem
-                button
-                selected={index === currentEmail}
-                onClick={() => setCurrentEmail(index)}
-                key={index}
+              button
+              key={email.id}
+              selected={index === currentEmail}
+              onClick={() => {
+                setCurrentEmail(index);
+                handleGetContentList(email.id);
+              }}
             >
               <ListItemIcon>
                   <EmailIcon fontSize="small" />
@@ -202,7 +219,10 @@ const EmailList = ({
                     {email.address}
               </Typography>
               <Button
-                onClick={() => setSettingOpen(true)}
+                onClick={() => {
+                  setUpdateAddress(email.address);
+                  setUpdateEmailOpen(true);
+                }}
                 style={{position: "absolute", bottom: 0, right: 0}}
               >
                     <SettingsIcon/>
@@ -211,34 +231,35 @@ const EmailList = ({
           ))}
         </MenuList>
         <Modal
-                open={settingOpen}
-                onClose={() => setSettingOpen(false)}
+                open={updateEmailOpen}
+                onClose={() => setUpdateEmailOpen(false)}
               >
-                {settingBody}
+                {updateEmailBody}
         </Modal>
       </Paper>
-      </Box>
-       <Box className={classes.addButton}>
-       <Button
-         color="primary"
-         onClick={() => setAddEmailOpen(true)}
-       >
-         <AddIcon/>
-       </Button>
-       <Modal
-         open={addEmailOpen}
-         onClose={() => setAddEmailOpen(false)}
-       >
-         {addEmailBody}
-       </Modal>
-       <Button
-         color="secondary"
-         disabled={currentEmail === -1}
-         onClick={handleDeleteEmail}
-       >
-         <RemoveIcon/>
-       </Button>
-     </Box>
+      <Button
+        color="primary"
+        variant="outlined"
+        onClick={() => setAddEmailOpen(true)}
+        className={classes.button}
+      >
+        <AddIcon/>
+      </Button>
+      <Modal
+        open={addEmailOpen}
+        onClose={() => setAddEmailOpen(false)}
+      >
+        {addEmailBody}
+      </Modal>
+      <Button
+        color="secondary"
+        variant="outlined"
+        disabled={currentEmail === -1}
+        onClick={handleDeleteEmail}
+        className={classes.button}
+      >
+        <RemoveIcon/>
+      </Button>
     </>
   );
 };
