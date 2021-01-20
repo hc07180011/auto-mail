@@ -142,16 +142,17 @@ const EditorPage = ({
     }
   };
 
-  const handleAddContent = async () => {
-    const subjectTmp = subject;
+  const handleAddContent = async (emailId, subject, text) => {
     const { status, id } = await addContent({
       token,
-      emailId: emailList[currentEmail].id,
+      emailId,
       subject,
-      text: braftEditorState.toHTML(),
+      text,
     });
     if (status === "ok") {
-      setContentList([...contentList, { id, subjectTmp }]);
+      if (currentEmail !== -1 && emailList[currentEmail].id === emailId) {
+        setContentList([...contentList, { id, subject }]);
+      }
       setStatus({ type: "success", msg: "Content was added." });
     } else {
       // unexpected error
@@ -159,15 +160,20 @@ const EditorPage = ({
     }
   };
 
-  const handleGetContent = async () => {
+  const handleGetContent = async (emailId, contentId) => {
     const { status, subject, text } = await getContent({
       token,
-      emailId: emailList[currentEmail].id,
-      contentId: contentList[currentContent].id
+      emailId,
+      contentId,
     });
     if (status === "ok") {
-      setSubject(subject);
-      setBraftEditorState(BraftEditor.createEditorState(text));
+      if (currentEmail !== -1 &&
+        emailList[currentEmail].id === emailId &&
+        currentContent !== -1 &&
+        contentList[currentContent].id === contentId) {
+        setSubject(subject);
+        setBraftEditorState(BraftEditor.createEditorState(text));
+      }
     } else {
       setStatus({ type: "error", msg: "Failed to load a content." });
     }
@@ -180,18 +186,24 @@ const EditorPage = ({
     }
   }, [currentContent]);
 
-  const handleUpdateContent = async () => {
+  const handleUpdateContent = async (emailId, contentId, subject) => {
     const { status } = await updateContent({
       token,
-      emailId: emailList[currentEmail].id,
-      contentId: contentList[currentContent].id,
+      emailId,
+      contentId,
       subject,
       text: braftEditorState.toHTML(),
     });
     if (status === "ok") {
-      let newContentList = contentList;
-      newContentList[currentContent].subject = subject;
-      setContentList(newContentList);
+      if (currentEmail !== -1 && emailList[currentEmail].id === emailId) {
+        let newContentList = contentList;
+        for (let i = 0; i < newContentList.length; i++) {
+          if (newContentList[i].id === contentId) {
+            newContentList[i].subject = subject;
+          }
+        }
+        setContentList(newContentList);
+      }
       setStatus({ type: "success", msg: "Content was updated." })
     } else {
       // unexpected error
@@ -201,12 +213,19 @@ const EditorPage = ({
 
   const handleDeleteContent = async () => {
     if (currentContent !== -1) {
-      const { status } = await deleteContent({ token, emailId: emailList[currentEmail].id, contentId: contentList[currentContent].id });
+      const emailId = emailList[currentEmail].id;
+      const contentId = contentList[currentContent].id;
+      setCurrentContent(-1);
+      const { status } = await deleteContent({ token, emailId, contentId});
       if (status === "ok") {
-        let newContentList = contentList;
-        newContentList.splice(currentContent, 1);
-        setContentList(newContentList);
-        setCurrentContent(-1);
+        if (currentEmail !== -1 && emailList[currentEmail].id === emailId) {
+          let newContentList = contentList;
+          for (let i = 0; i < newContentList.length; i++) {
+            if (newContentList[i].id === contentId)
+              newContentList.splice(i, 1);
+          }
+          setContentList(newContentList);
+        }
         setStatus({ type: "success", msg: "Content was deleted." })
       } else {
         // unexpected error
@@ -246,6 +265,8 @@ const EditorPage = ({
         </Grid>
         <Grid item xs={8}>
           <ContentList
+            emailList={emailList}
+            currentEmail={currentEmail}
             contentList={contentList}
             currentContent={currentContent}
             setCurrentContent={setCurrentContent}
@@ -254,14 +275,10 @@ const EditorPage = ({
           />
           <Editor
             disabled={currentEmail === -1}
-            currentContent={currentContent}
             subject={subject}
             setSubject={setSubject}
             braftEditorState={braftEditorState}
             setBraftEditorState={setBraftEditorState}
-            handleAddContent={handleAddContent}
-            handleUpdateContent={handleUpdateContent}
-            handleDeliver={handleDeliver}
           />
         </Grid>
       </Grid>
@@ -290,6 +307,15 @@ const EditorPage = ({
               variant="contained"
               color="primary"
               className={classes.button}
+              onClick={currentContent === -1 ? (() => {
+                handleAddContent(emailList[currentEmail].id, subject, braftEditorState.toHTML());
+                setSubject("");
+                setBraftEditorState(BraftEditor.createEditorState(null));
+              }) : (() => handleUpdateContent(
+                emailList[currentEmail].id,
+                contentList[currentContent].id,
+                subject,
+              ))}
             >
               {currentContent === -1 ? "Save" : "Update"}
             </Button>

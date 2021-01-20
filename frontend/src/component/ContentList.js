@@ -10,6 +10,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import Grid from "@material-ui/core/Grid";
 import { useState } from "react";
+import EmailList from './EmailList';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -55,6 +56,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ContentList = ({
+  emailList,
+  currentEmail,
   contentList,
   currentContent,
   setCurrentContent,
@@ -64,7 +67,7 @@ const ContentList = ({
   const classes = useStyles();
 
   return (
-    <Grid container className={classes.root}>
+    <Grid container className={classes.root} direction="row" alignItems="center">
       <Grid item xs={11}>
         <Tabs
             value={currentContent}
@@ -75,14 +78,15 @@ const ContentList = ({
             textColor="primary"
             aria-label="scrollable force tabs example"
         >
-            {contentList.map((content, idx) => (
-              <Tab
-                key={idx}
-                label={content.subject}
-                icon={<AssignmentIcon />}
-                {...a11yProps({ idx })}
-              />
-            ))}
+          {contentList.map((content, idx) => (
+            <Tab
+              key={content.id}
+              label={content.subject}
+              icon={<AssignmentIcon />}
+              onClick={() => handleGetContent(emailList[currentEmail].id, content.id)}
+              {...a11yProps({ idx })}
+            />
+          ))}
         </Tabs> 
       </Grid>
       <Grid xs={1}>
@@ -92,12 +96,13 @@ const ContentList = ({
           className={classes.button}
           onClick={() => setCurrentContent(-1)}
         >
-          <AddCircleIcon/>
+          <AddCircleIcon/> 
         </Button>
         <Button
           variant="contained"
           color="primary"
           className={classes.button}
+          disabled={currentContent === -1}
           onClick={handleDeleteContent}
         >
           <RemoveCircleIcon/>
