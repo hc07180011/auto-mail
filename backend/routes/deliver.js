@@ -42,7 +42,7 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
         excelData[tmpExcelData[0][i]].push(tmpExcelData[j][i])
       }
     }
-    console.log('/deliver/create', productionMode, token, emailId, subject, text, authToken, recipients, cc, bcc, excelData, attachments)
+    console.log('/deliver/create', productionMode, token, emailId, subject, text, authToken, recipients, cc, bcc, excelData, attachments.length)
 
     User.find({
       $and: [
@@ -109,19 +109,32 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
                 bcc_.push(excelData[bcc[j]][i])
               }
 
-              var html = text
+              var subject_ = subject
               for (var j = 0; j < tmpExcelData[0].length; j++) {
-                html = html.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
+                subject_ = subject_.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
               }
+              var html_ = text
+              for (var j = 0; j < tmpExcelData[0].length; j++) {
+                html_ = html_.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
+              }
+
+              console.log('round', i)
+              console.log('===========')
+              console.log('from: ', response[0].mailList[0].address)
+              console.log('to: ', to_)
+              console.log('cc: ', cc_)
+              console.log('bcc: ', bcc_)
+              console.log('subject: ', subject_)
+              console.log('html: ', html_)
 
               var mailOptions = {
                 from: response[0].mailList[0].address,
                 to: to_,
                 cc: cc_,
                 bcc: bcc_,
-                subject: subject,
+                subject: subject_,
                 generateTextFromHTML: true,
-                html: html,
+                html: html_,
                 attachments: attachments.map((attachment) => (
                   {
                     filename: attachment.originalname,
