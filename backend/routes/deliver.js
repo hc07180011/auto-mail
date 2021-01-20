@@ -98,24 +98,34 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
               
               var to_ = []
               for (var j = 0; j < recipients.length; j++) {
-                to_.push(excelData[recipients[j]][i])
+                if (excelData[recipients[j]][i]) {
+                  to_.push(excelData[recipients[j]][i])
+                }
               }
               var cc_ = []
               for (var j = 0; j < cc.length; j++) {
-                cc_.push(excelData[cc[j]][i])
+                if (excelData[cc[j]][i]) {
+                  cc_.push(excelData[cc[j]][i])
+                }
               }
               var bcc_ = []
               for (var j = 0; j < bcc.length; j++) {
-                bcc_.push(excelData[bcc[j]][i])
+                if (excelData[bcc[j]][i]) {
+                  bcc_.push(excelData[bcc[j]][i])
+                }
               }
 
               var subject_ = subject
               for (var j = 0; j < tmpExcelData[0].length; j++) {
-                subject_ = subject_.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
+                if (excelData[tmpExcelData[0][j]][i]) {
+                  subject_ = subject_.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
+                }
               }
               var html_ = text
               for (var j = 0; j < tmpExcelData[0].length; j++) {
-                html_ = html_.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
+                if (excelData[tmpExcelData[0][j]][i]) {
+                  html_ = html_.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
+                }
               }
 
               console.log('round', i)
