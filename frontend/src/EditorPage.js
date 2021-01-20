@@ -50,6 +50,7 @@ const EditorPage = ({
   const [currentContent, setCurrentContent] = useState(-1);
   const [subject, setSubject] = useState("");
   const [braftEditorState, setBraftEditorState] = useState(BraftEditor.createEditorState(null));
+  const [files, setFiles] = useState([]);
 
   useEffect(() => {
     (async function () {
@@ -240,6 +241,10 @@ const EditorPage = ({
 
   }
 
+  useEffect(() => {
+    console.log(files);
+  }, [files]);
+
   return (
     <>
       <Grid container spacing={2} justify="center" className={classes.root}>
@@ -281,6 +286,8 @@ const EditorPage = ({
             setBraftEditorState={setBraftEditorState}
           />
         </Grid>
+        <Grid item xs={12}></Grid>
+        <Grid item xs={12}></Grid>
       </Grid>
       <Box mt={8} style={{ backgroundColor: "rgb(216, 234, 245)", position: "fixed", bottom: "0%", width: "100%", zIndex: 950 }}>
         <Grid container justify="flex-end" spacing={2}>
@@ -295,11 +302,13 @@ const EditorPage = ({
           </Grid>
           <Grid item>
             <Button
+              component="label"
               variant="contained"
               color="primary"
               className={classes.button}
             >
               Attachments
+              <input type="file" hidden onChange={(e) => setFiles(e.target.files)}/>
             </Button>
           </Grid>
           <Grid item>

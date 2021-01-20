@@ -6,8 +6,8 @@ import AssignmentIcon from '@material-ui/icons/Assignment';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import CreateIcon from '@material-ui/icons/Create';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import Grid from "@material-ui/core/Grid";
 import { useState } from "react";
 import EmailList from './EmailList';
@@ -80,7 +80,7 @@ const ContentList = ({
         >
           {contentList.map((content, idx) => (
             <Tab
-              key={content.id}
+              key={`${content.id}_${content.subject}`}
               label={content.subject}
               icon={<AssignmentIcon />}
               onClick={() => handleGetContent(emailList[currentEmail].id, content.id)}
@@ -96,16 +96,16 @@ const ContentList = ({
           className={classes.button}
           onClick={() => setCurrentContent(-1)}
         >
-          <AddCircleIcon/> 
+          <CreateIcon/> 
         </Button>
         <Button
           variant="contained"
-          color="primary"
+          color="secondary"
           className={classes.button}
           disabled={currentContent === -1}
           onClick={handleDeleteContent}
         >
-          <RemoveCircleIcon/>
+          <DeleteForeverIcon/>
         </Button>
       </Grid>
     </Grid>
