@@ -202,18 +202,24 @@ router.post('/detail/update', (req, res) => {
       }
       else {
         for (var i = 0; i < response[0].mailList[0].content.length; i++) {
+          console.log(response[0].mailList[0].content[i])
           if (String(response[0].mailList[0].content[i]._id) === contentId) {
-            response[0].mailList[0].content[i].subject = subject
-            response[0].mailList[0].content[i].text = text
-            response[0].markModified("mailList.0.content." + String(i) + ".subject")
-            response[0].markModified("mailList.0.content." + String(i) + ".text")
-            response[0].save()
+            response[0].mailList[0].content[i] = {
+              _id: mongoose.Types.ObjectId(contentId),
+              subject: subject,
+              text: text,
+              attachments: []
+            }
+            console.log('after mod', response[0].mailList[0].content[i])
+            response[0].markModified("mailList.0.content")
             console.log('ok')
             res.status(200).send({
               status: 'ok',
             })
+            response[0].save()
+            return
           }
-        }
+        }        
       }
     })
   } catch(error) {
