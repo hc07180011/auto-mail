@@ -108,6 +108,11 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
                 bcc_.push(excelData[bcc[j]][i])
               }
 
+              var subject_ = subject
+              for (var j = 0; j < tmpExcelData[0].length; j++) {
+                subject_ = subject_.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
+              }
+
               var html = text
               for (var j = 0; j < tmpExcelData[0].length; j++) {
                 html = html.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
@@ -118,7 +123,7 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
                 to: to_,
                 cc: cc_,
                 bcc: bcc_,
-                subject: subject,
+                subject: subject_,
                 generateTextFromHTML: true,
                 html: html,
                 attachments: attachments.map((attachment) => (
