@@ -178,41 +178,44 @@ router.post('/detail/update', (req, res) => {
     const text = req.body.text
     console.log('/content/detail/update', token, emailId, contentId, subject, text)
 
-    User.updateOne({
-        $and: [
-          { token: token },
-          { "mailList._id": emailId },
-          { "mailList.content._id": contentId },
-        ]
-      },
-      { 
-        $set: {
-          "mailList.0.content.$.subject": subject,
-          "mailList.0.content.$.text": text,
-        },
-      },
-      (err, result) => {
-        console.log(err)
-        if (err) {
-          console.log('internal error')
-          res.status(500).send({
-            status: 'internal error',
-          })
-        }
-        else if (!result.n) {
-          console.log('token/emailId invalid')
-          res.status(200).send({
-            status: 'token/emailId invalid',
-          })
-        }
-        else {
-          console.log('ok')
-          res.status(200).send({
-            status: 'ok',
-          })
-        }
-      },
+    User.find({
+      $and: [
+        { token: token },
+        { "mailList._id": emailId },
+        { "mailList.content._id": contentId },
+      ]
+    },
+    { "mailList.content.$": 1 }
     )
+    .exec((error, response) => {
+      if (error) {
+        console.log('internal error')
+        res.status(500).send({
+          status: 'internal error',
+        })
+      }
+      else if (!response.length || !response[0].mailList.length || !response[0].mailList[0].content.length) {
+        console.log('token/emailId/contentId invalid')
+        res.status(200).send({
+          status: 'token/emailId/contentId invalid',
+        })
+      }
+      else {
+        for (var i = 0; i < response[0].mailList[0].content.length; i++) {
+          if (String(response[0].mailList[0].content[i]._id) === contentId) {
+            response[0].mailList[0].content[i].subject = subject
+            response[0].mailList[0].content[i].text = text
+            response[0].markModified("mailList.0.content." + String(i) + ".subject")
+            response[0].markModified("mailList.0.content." + String(i) + ".text")
+            response[0].save()
+            console.log('ok')
+            res.status(200).send({
+              status: 'ok',
+            })
+          }
+        }
+      }
+    })
   } catch(error) {
     console.log(error)
     res.status(500).send({
