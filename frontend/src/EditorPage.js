@@ -292,6 +292,7 @@ const EditorPage = ({
         subject,
       );
     }
+    data.append("productionMode", process.env.PRODUCTION_MODE || "false");
     data.append("token", tokenTmp);
     data.append("emailId", emailIdTmp);
     if (authToken)
