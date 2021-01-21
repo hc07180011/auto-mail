@@ -37,6 +37,12 @@ For organizations or activity holders, there are frequent needs to send a larger
 
  4. Content will be saved automatically afted sending
 
+<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content6.png" width="600">
+
+ 5. Reveice mail
+
+<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content7.png" width="600">
+
 
 ## Frontend
 
