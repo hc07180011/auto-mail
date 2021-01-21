@@ -82,6 +82,7 @@ npm install
 3. Build the application
 
 ```bash
+npm run build
 npm run build-app
 ```
 
