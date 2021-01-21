@@ -2,6 +2,27 @@
 
 <img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/favicon.png" width="200">
 
+## Motivation
+For organizations or activity holders, there are frequent needs to send a larger number of emails with a similar format to members or participants. However, sometimes PR wants to customize mail contents according to the receiver's personal information (e.g. name, student id, etc), so they have to send the emails one by one. To deal with the problem, we decide to build an automatic email sending service and share the service with others.
+
+## Service
+### Login
+ - Sign up
+ - Login
+    - Username and Password
+    - Google Account
+
+### Editor Page
+ 1. Choose an email account as email-sender
+
+<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content1.png" width="500">
+
+ 2. Upload excel files with receiver information
+
+<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content2.png" width="500">
+
+ 3.  
+
 ## Frontend
 
 ### Environment
