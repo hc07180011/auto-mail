@@ -323,7 +323,7 @@ const EditorPage = ({
         <GoogleLogin
           clientId={process.env.REACT_APP_CLIENT_ID || "421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com"}
           buttonText="Send Gmail"
-          scope="https://mail.google.com/"
+          scope="https://www.googleapis.com/auth/gmail.compose/"
           responseType="code"
           approvalPrompt="force"
           prompt='consent'
