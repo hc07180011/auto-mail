@@ -45,7 +45,7 @@ For organizations or activity holders, there are frequent needs to send a larger
 
  6. Add new mail or use the old one as template
 
-<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content8.png" width="600"> 
+<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content9.png" width="600"> 
 
 ## Frontend
 
