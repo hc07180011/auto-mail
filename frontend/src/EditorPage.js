@@ -276,6 +276,7 @@ const EditorPage = ({
     const tokenTmp = token;
     const emailIdTmp = emailList[currentEmail].id;
     const authToken = response ? response.code : null;
+    console.log(authToken);
     const subjectTmp = subject;
     const textTmp = braftEditorState.toHTML();
     const attachmentsTmp = attachments;
@@ -315,15 +316,15 @@ const EditorPage = ({
   }
 
   const SubmitButton = () => {
-    if (currentEmail !== -1 &&
+    if (/*currentEmail !== -1 &&
       emailList[currentEmail].address.length > 10 &&
-      emailList[currentEmail].address.substr(emailList[currentEmail].address.length - 10) === "@gmail.com" &&
+      emailList[currentEmail].address.substr(emailList[currentEmail].address.length - 10) === "@gmail.com" &&*/
       recipientData[0] !== "") {
       return (
         <GoogleLogin
           clientId={process.env.REACT_APP_CLIENT_ID || "421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com"}
           buttonText="Send Gmail"
-          scope="https://www.googleapis.com/auth/gmail.compose/"
+          scope="https://mail.google.com/"
           responseType="code"
           approvalPrompt="force"
           prompt='consent'
@@ -339,6 +340,7 @@ const EditorPage = ({
           variant="contained"
           color="primary"
           className={classes.button}
+          disabled={recipientData[0] !== ""}
           onClick={recipientData[0] !== "" ? (() => handleDeliver(false)) :
             (currentContent === -1 ? (() => {
               handleAddContent(emailList[currentEmail].id, subject, braftEditorState.toHTML());
