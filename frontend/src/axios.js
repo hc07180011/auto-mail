@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseURL = "https://api-pigeons.herokuapp.com/";
+const baseURL = process.env.REACT_APP_BASE_URL || "https://api-pigeons.herokuapp.com/";
 const instance = axios.create({ baseURL: baseURL });
 
 const login = async (req) => {

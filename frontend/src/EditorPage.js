@@ -292,7 +292,7 @@ const EditorPage = ({
         subject,
       );
     }
-    data.append("productionMode", process.env.PRODUCTION_MODE || "false");
+    data.append("productionMode", process.env.REACT_APP_PRODUCTION_MODE || "true");
     data.append("token", tokenTmp);
     data.append("emailId", emailIdTmp);
     if (authToken)
@@ -321,7 +321,7 @@ const EditorPage = ({
       recipientData[0] !== "") {
       return (
         <GoogleLogin
-          clientId="421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com"
+          clientId={process.env.REACT_APP_CLIENT_ID || "421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com"}
           buttonText="Send Gmail"
           scope="https://mail.google.com/"
           responseType="code"

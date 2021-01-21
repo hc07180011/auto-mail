@@ -211,7 +211,7 @@ const LoginPage = ({ toSignUp, toEditor, setToken, setUsername, setStatus }) => 
             Log In
           </Button>
           <GoogleLogin
-            clientId="421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com"
+            clientId={process.env.REACT_APP_CLIENT_ID || "421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com"}
             buttonText="Log in with Google"
             onSuccess={googleLoginSuccess}
             onFailure={googleLoginFailure}
