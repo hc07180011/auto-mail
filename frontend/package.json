@@ -2,7 +2,7 @@
   "name": "auto-mail",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/",
+  "homepage": ".",
   "main": "./electron/main.js",
   "dependencies": {
     "@agney/react-loading": "^0.1.2",
@@ -14,13 +14,12 @@
     "antd": "^4.10.3",
     "axios": "^0.21.1",
     "braft-editor": "^2.3.9",
-    "copy-to-clipboard": "^3.3.1",
+    "electron-packager": "^15.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-google-login": "^5.2.2",
     "react-scripts": "4.0.1",
-    "web-vitals": "^0.2.4",
-    "xlsx": "^0.16.9"
+    "web-vitals": "^0.2.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -29,7 +28,7 @@
     "eject": "react-scripts eject",
     "electron-dev": "npm run build && electron . dev",
     "electron": "electron .",
-    "build-app": "electron-packager . Pigeons --platform=darwin --arch=x64 --asar"
+    "build-app": "electron-packager ./ Pigeons --platform=darwin --arch=x64 --asar --icon=logo.ico --overwrite"
   },
   "eslintConfig": {
     "extends": [
@@ -48,5 +47,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "electron": "^11.2.0"
   }
 }
