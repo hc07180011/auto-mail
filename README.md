@@ -27,11 +27,11 @@ For organizations or activity holders, there are frequent needs to send a larger
 
  3. Add tags to email 
   - Tag content will be copied to clipborad when a tag is clicked. 
-  - Recipients, CC, BCC: add tags through plus button
+  - Recipients, cc, bcc: Add tags through plus button
 
 <img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content4.png" width="600">
 
-  - Subject, Email content: 
+  - Subject, Email content: simply paste (ctrl+v, cmd+v, etc)
 
 <img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content5.png" width="600">
 
@@ -39,7 +39,7 @@ For organizations or activity holders, there are frequent needs to send a larger
 
 <img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content6.png" width="600">
 
- 5. Reveice mail
+ 5. Receive mail
 
 <img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content7.png" width="600">
 
