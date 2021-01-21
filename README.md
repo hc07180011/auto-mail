@@ -19,7 +19,7 @@ For organizations or activity holders, there are frequent needs to send a larger
 
 <img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content1.png" width="600">
 
- 2. Upload excel files with receiver information
+ 2. Upload an excel file with receiver information
 
 <img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content2.png" width="600">
 
