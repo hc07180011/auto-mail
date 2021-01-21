@@ -192,10 +192,6 @@ router.post('/detail/update', (req, res) => {
       } else {
         for (var i = 0; i < doc.mailList.length; i++) {
           for (var j = 0; j < doc.mailList[i].content.length; j++) {
-            // console.log('====================')
-            // console.log(i, j)
-            // console.log(doc.mailList[i])
-            // console.log(doc.mailList[i].content[j])
             if (String(doc.mailList[i]._id) == emailId && String(doc.mailList[i].content[j]._id) === contentId) {
               doc.mailList[i].content[j] = {
                 _id: mongoose.Types.ObjectId(contentId),
