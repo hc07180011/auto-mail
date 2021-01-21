@@ -12,16 +12,31 @@ For organizations or activity holders, there are frequent needs to send a larger
     - Username and Password
     - Google Account
 
+<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/login_page.png" width="600">
+
 ### Editor Page
  1. Choose an email account as email-sender
 
-<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content1.png" width="500">
+<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content1.png" width="600">
 
  2. Upload excel files with receiver information
 
-<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content2.png" width="500">
+<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content2.png" width="600">
 
- 3.  
+<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content3.png" width="600">
+
+ 3. Add tags to email 
+  - Tag content will be copied to clipborad when a tag is clicked. 
+  - Recipients, CC, BCC: add tags through plus button
+
+<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content4.png" width="600">
+
+  - Subject, Email content: 
+
+<img src="https://github.com/hc07180011/auto-mail/blob/main/frontend/public/service_content5.png" width="600">
+
+ 4. Content will be saved automatically afted sending
+
 
 ## Frontend
 
