@@ -169,7 +169,7 @@ const App = () => {
     return (
       <AppBar style={{ background: "rgb(216,234,245)", marginBottom: "1%" }} position="static">
           <Toolbar>
-            <a id="welcomePage" href="./welcome/">
+            <a id="welcomePage" href="./welcome/index.html">
               <img
                 alt="logo-img-main"
                 src={logo}
