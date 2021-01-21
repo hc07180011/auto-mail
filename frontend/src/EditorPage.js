@@ -424,6 +424,7 @@ const EditorPage = ({
                 onClick={(e) => {
                   copy(`$[[${elem}]]`);
                   setCopyData(`$[[${elem}]],`);
+                  setStatus({ type: "info", msg: "Copied to clipboard." });
                 }}
               />
             )) : <></>}
