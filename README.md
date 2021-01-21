@@ -153,10 +153,10 @@ npm run server
   * Backend: MongoDB, Node.js, API
   * Deployment
 * 邱于賓, B06902096, CSIE, NTU
-  * Frontend: Flow desing, UI optimization
+  * Frontend: Flow tesing, UI optimization
   * Backend: API testing
 * 陳彥　, B06902047, CSIE, NTU
-  * Frontend: UI desing, packages research
+  * Frontend: UI tesing, packages research
   * Backend: API testing
 
 ### 外掛
