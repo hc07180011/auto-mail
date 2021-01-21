@@ -20,6 +20,21 @@ if (!process.env.MONGO_URL) {
   process.exit(1)
 }
 
+if (!process.env.CLIENT_ID) {
+  console.error('Missing CLIENT_ID!!!')
+  process.exit(1)
+}
+
+if (!process.env.CLIENT_SECRET) {
+  console.error('Missing CLIENT_SECRET!!!')
+  process.exit(1)
+}
+
+if (!process.env.REDIRECT_URL) {
+  console.error('Missing REDIRECT_URL!!!')
+  process.exit(1)
+}
+
 mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true
