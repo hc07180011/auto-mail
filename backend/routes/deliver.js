@@ -68,9 +68,9 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
       else {
         if (response[0].mailList[0].address.includes('gmail.com')) {
           const oAuth2Client = new OAuth2(
-            '421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com',
-            'ZoVhm_48CzhGJfDN2zqjDRj7',
-            'https://pigeons-mail.vercel.app'
+            process.env.CLIENT_ID,
+            process.env.CLIENT_SECRET,
+            process.env.REDIRECT_URL,
           )
 
           oAuth2Client
@@ -89,8 +89,8 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
                 auth: {
                     type: 'OAuth2',
                     user: response[0].mailList[0].address,
-                    clientId: '421394122052-uslhegpknc7pqmfeto1k6rr65m28gtdi.apps.googleusercontent.com',
-                    clientSecret: 'ZoVhm_48CzhGJfDN2zqjDRj7',
+                    clientId: process.env.CLIENT_ID,
+                    clientSecret: process.env.CLIENT_SECRET,
                     refreshToken: refreshToken,
                     accessToken: accessToken,
                 },
@@ -119,12 +119,16 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
               for (var j = 0; j < tmpExcelData[0].length; j++) {
                 if (excelData[tmpExcelData[0][j]][i]) {
                   subject_ = subject_.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
+                } else {
+                  subject_ = subject_.replace(tmpExcelData[0][j], '')
                 }
               }
               var html_ = text
               for (var j = 0; j < tmpExcelData[0].length; j++) {
                 if (excelData[tmpExcelData[0][j]][i]) {
                   html_ = html_.replace(tmpExcelData[0][j], excelData[tmpExcelData[0][j]][i])
+                } else {
+                  html_ = html_.replace(tmpExcelData[0][j], '')
                 }
               }
 
