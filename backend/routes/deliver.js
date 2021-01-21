@@ -66,7 +66,7 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
         })
       }
       else {
-        if (response[0].mailList[0].address.includes('gmail.com')) {
+        if (authToken) {
           const oAuth2Client = new OAuth2(
             process.env.CLIENT_ID,
             process.env.CLIENT_SECRET,
@@ -177,7 +177,15 @@ router.post('/create', upload.array('attachments', 8), (req, res) => {
           })
         }
         else {
+
+          console.log('ok')
+            res.status(200).send({
+              status: 'ok',
+            })
+          return
+
           recipients.forEach((recipient) => {
+
             var transporter = nodemailer.createTransport({
               host: 'smtps.ntu.edu.tw',
               port: 465,
