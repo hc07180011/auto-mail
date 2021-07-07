@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseURL = "https://api-pigeons.herokuapp.com/";
+const baseURL = process.env.REACT_APP_BASE_URL || "https://api-pigeons.herokuapp.com/";
 const instance = axios.create({ baseURL: baseURL });
 
 const login = async (req) => {
@@ -59,7 +59,9 @@ const deleteContent = async (req) => {
 }
 
 const deliver = async (req) => {
-  const { data } = await instance.post("/deliver/create", req);
+  const { data } = await instance.post("/deliver/create", req, {
+    'content-type': 'multipart/form-data'
+  });
   return data;
 }
 
